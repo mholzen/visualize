@@ -42,6 +42,18 @@ server.route
     reply.view 'force-directed',
       uri: request.params.uri
 
+marked = require 'marked'
+wreck = require 'wreck'
+
+server.route
+  method: 'GET'
+  path: '/html/{uri*}'
+  handler: (request, reply) ->
+    reply.proxy
+      uri: server.info.protocol + '://' + server.info.host + ':' + server.info.port + '/'+request.params.uri,
+      onResponse: (err, res, request, reply, settings, ttl)->
+        wreck.read res, null, (err, payload)->
+          reply marked( payload.toString() )
 
 server.start ()->
   console.log('Server running at:', server.info.uri)

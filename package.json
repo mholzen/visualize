@@ -5,7 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "hapi": "~8.0.0",
-    "handlebars": "~2.0.0"
+    "handlebars": "~2.0.0",
+    "wreck": "~5.1.0",
+    "marked": "~0.3.2"
   },
   "devDependencies": {},
   "scripts": {
