@@ -3,14 +3,25 @@ Hapi = require 'hapi'
 server = new Hapi.Server()
 
 server.connection
-  port: 8000
+  port: 8001
 
 Path = require 'path'
 
 server.views
   engines:
-    html: require 'handlebars'
+    html:
+      module: require 'handlebars'
+      isCached: false
+    jade:
+      module: require 'jade'
+      isCached: false
   path: Path.join __dirname, 'templates'
+
+server.route
+  method: 'GET',
+  path: '/'
+  handler: (request, reply)->
+    reply.view 'prompt.jade'
 
 server.route
   method: 'GET',
@@ -18,6 +29,7 @@ server.route
   handler:
     directory:
       path: 'static'
+      listing: true
 
 fs = require 'fs'
 parse = require 'csv-parse'
@@ -29,11 +41,11 @@ server.route
   handler: (request, reply) ->
     input = fs.createReadStream Path.join __dirname, request.params.uri
     parser = parse()
+    console.log graph
     mapper = new graph.MatrixGraphMapper()
     stream = input.pipe(parser).pipe(mapper)
     stream.on 'finish', ->
-      graph = mapper.graph
-      reply graph.toJSON()
+      reply mapper.graph.toJSON()
 
 server.route
   method: 'GET'
@@ -56,4 +68,4 @@ server.route
           reply marked( payload.toString() )
 
 server.start ()->
-  console.log('Server running at:', server.info.uri)
+  console.log 'Server running at:', server.info.uri
