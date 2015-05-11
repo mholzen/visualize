@@ -6,9 +6,9 @@ text {
   font: 20px sans-serif;
 }
 
-circle {
+/*circle {
   fill: rgb(198, 232, 255);
-}
+}*/
 
 .link {
   stroke: #999;
@@ -26,8 +26,8 @@ var width = window.innerWidth,
 var color = d3.scale.category20();
 
 var force = d3.layout.force()
-    .charge(-500)
-    .linkDistance(600)
+    .charge(-100)
+    .linkDistance(30)
     .size([width, height]);
 
 var svg = d3.select("body").append("svg")
@@ -35,7 +35,7 @@ var svg = d3.select("body").append("svg")
     .attr("height", height);
 
 d3.json("/{{uri}}", function(error, graph) {
-  console.log(error);
+  console.log(error, graph);
   force
       .nodes(graph.nodes)
       .links(graph.links)
@@ -53,17 +53,26 @@ d3.json("/{{uri}}", function(error, graph) {
       .attr("class", "node")
       .call(force.drag);
 
+  node.append('pattern')
+    .attr('id', 'image')
+    .append('image').attr('xlink:href', function(d) { return d.href });
+      // <defs>
+      //     <pattern id="image" x="0" y="0" patternUnits="userSpaceOnUse" height="1" width="1">
+      //       <image x="0" y="0" xlink:href="url.png"></image>
+      //     </pattern>
+      //   </defs>
+
   node.append('circle')
-      .attr("r", 60);
-      // .style("fill", function(d) { return color(d.group); });
+      .attr("r", 60)
+      .attr("fill", function(d) { return "url(#image)"; });
 
   node.append("title")
-      .text(function(d) { return d.name; });
+      .text(function(d) { return d.label; });
 
   node.append("text")
       .attr("dy", ".3em")
       .style("text-anchor", "middle")
-      .text(function(d) { return d.name; });
+      .text(function(d) { return d.label; });
 
   force.on("tick", function() {
     link.attr("x1", function(d) { return d.source.x; })

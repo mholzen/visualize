@@ -15,6 +15,7 @@ server.views
     jade:
       module: require 'jade'
       isCached: false
+  defaultExtension: 'html'
   path: Path.join __dirname, 'templates'
 
 server.route
@@ -32,20 +33,42 @@ server.route
       listing: true
 
 fs = require 'fs'
-parse = require 'csv-parse'
+csvparse = require 'csv-parse'
 graph = require '../graph'
 
 server.route
   method: 'GET'
   path: '/graph/{uri*}'
   handler: (request, reply) ->
+    # should use content-type to determine next action
     input = fs.createReadStream Path.join __dirname, request.params.uri
-    parser = parse()
-    console.log graph
-    mapper = new graph.MatrixGraphMapper()
+    parser = csvparse
+      columns: true
+    mapper = new graph.MatrixGraphMapper
     stream = input.pipe(parser).pipe(mapper)
     stream.on 'finish', ->
+      mapper.graph.add 'marc', 'label', 'Marc'
+      mapper.graph.subjects().forEach (subject)->
+        mapper.graph.add 'marc', 'link', subject
       reply mapper.graph.toJSON()
+
+wreck = require 'wreck'
+marked = require 'marked'
+cheerio = require 'cheerio'
+
+server.route
+  method: 'GET'
+  path: '/graph-from-html/{uri*}'
+  handler: (request, reply) ->
+    reply.proxy
+      uri: server.info.protocol + '://' + server.info.host + ':' + server.info.port + '/'+request.params.uri,
+      onResponse: (err, res, request, reply, settings, ttl)->
+        wreck.read res, null, (err, payload)->
+          html = marked( payload.toString() )
+          $ = cheerio.load html
+          g = graph.toGraph $.root()
+          reply g.toJSON()
+
 
 server.route
   method: 'GET'
@@ -53,9 +76,6 @@ server.route
   handler: (request, reply) ->
     reply.view 'force-directed',
       uri: request.params.uri
-
-marked = require 'marked'
-wreck = require 'wreck'
 
 server.route
   method: 'GET'
