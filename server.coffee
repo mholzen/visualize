@@ -34,7 +34,7 @@ server.route
 
 fs = require 'fs'
 csvparse = require 'csv-parse'
-graph = require '../graph'
+graph = require './libs/graph'
 
 server.route
   method: 'GET'
