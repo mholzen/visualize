@@ -66,7 +66,7 @@ server.route
         wreck.read res, null, (err, payload)->
           html = marked( payload.toString() )
           $ = cheerio.load html
-          g = graph.toGraph $.root()
+          g = graph.toGraph $
           reply g.toJSON()
 
 
