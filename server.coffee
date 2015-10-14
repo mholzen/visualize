@@ -87,5 +87,4 @@ server.route
         wreck.read res, null, (err, payload)->
           reply marked( payload.toString() )
 
-server.start ()->
-  console.log 'Server running at:', server.info.uri
+module.exports = server

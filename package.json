@@ -4,17 +4,19 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "hapi": "~8.0.0",
-    "handlebars": "~2.0.0",
-    "wreck": "~5.1.0",
-    "marked": "~0.3.2",
     "coffee-script": "~1.9.1",
-    "jade": "~1.9.2"
+    "forever": "^0.15.1",
+    "handlebars": "~2.0.0",
+    "hapi": "~8.0.0",
+    "jade": "~1.9.2",
+    "marked": "~0.3.2",
+    "wreck": "~5.1.0"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node_modules/.bin/coffee server.coffee"
+    "start": "forever -w node_modules/.bin/coffee index.coffee &",
+    "poststart": "open http://localhost:8001/"
   },
   "author": "",
   "license": "BSD-2-Clause"
