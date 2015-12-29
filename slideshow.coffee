@@ -7,17 +7,25 @@ module.exports =
 
 wreck = require 'wreck'
 
+
+addScheme = (uri)->
+  if uri.indexOf('http') != 0
+     uri = 'http://' + request.info.host + '/' + request.params.uri
+  return uri
+
 module.exports =
   method: 'GET'
   path: '/slideshow/{uri*}'
   handler: (request, reply) ->
-    uri = 'http://' + request.info.host + '/' + request.params.uri
-    uri = 'https://www.reddit.com/r/CityPorn+EarthPorn+ExposurePorn+lakeporn+wallpaper+wallpapers+windowshots/.json?&after=&limit=25'
-    # uri = 'https://www.reddit.com/r/nsfw/.json?&after=&limit=25'
+    uri = addScheme request.params.uri
     reply.proxy
       uri: uri
       onResponse: (err, res, request, reply, settings, ttl)->
+        if err
+          reply err
         wreck.read res, {json: true}, (err, payload)->
+          if err
+            return reply err
           images = payload.data.children.map (child)->child.data.url
           reply.view 'slideshow',
             uri: uri
