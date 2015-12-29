@@ -26,8 +26,8 @@ var width = window.innerWidth,
 var color = d3.scale.category20();
 
 var force = d3.layout.force()
-    .charge(-500)
-    .linkDistance(100)
+    .charge(-1000)
+    .linkDistance(300)
     .size([width, height]);
 
 var svg = d3.select("body").append("svg")
@@ -53,9 +53,19 @@ d3.json("/{{uri}}", function(error, graph) {
       .attr("class", "node")
       .call(force.drag);
 
-  node.append('pattern')
-    .attr('id', 'image')
-    .append('image').attr('xlink:href', function(d) { return d.href });
+  svg.insert('defs', ':first-child')
+      .append('pattern')
+        .attr('id', 'image')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('patternUnits', "userSpaceOnUse")
+        .attr('height', "1")
+        .attr('width', "1")
+        .append('image')
+          .attr('x', 0)
+          .attr('y', 0)
+          .attr('xlink:href', 'http://beta.vonholzen.org/static/commodore.jpeg');
+          // .attr('xlink:href', function(d) { return d.href });
       // <defs>
       //     <pattern id="image" x="0" y="0" patternUnits="userSpaceOnUse" height="1" width="1">
       //       <image x="0" y="0" xlink:href="url.png"></image>
@@ -64,6 +74,7 @@ d3.json("/{{uri}}", function(error, graph) {
 
   node.append('circle')
       .attr("r", 60)
+      // .attr("fill", "#eee")
       .attr("fill", function(d) { return "url(#image)"; });
 
   node.append("title")

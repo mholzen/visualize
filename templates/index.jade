@@ -13,7 +13,18 @@ html(lang='en')
 
   body
     div#content
-      a(href='/force-directed/graph/static/data/friends.csv') friends
+      a(href='/force-directed/graph/files/data/friends.csv') friends
+      br
+      
+      a(href="/chart/csv2json/files/private/data/mint.com/trends.csv") Net worth over time
+      br
+      
+      a(href="/slideshow") Ken Burns slideshow
+      br
+
+      a(href="/templates/bars/csv2json/files/private/data/mint.com/trends.csv") Net worth over time using d3
+      br
+
       p.line
         span.prompt > &nbsp;
         span(contenteditable='true')

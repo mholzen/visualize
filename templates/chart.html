@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+</style>
+<body>
+
+	<div style="width: 100%">
+		<canvas id="canvas" height="450" width="600"></canvas>
+	</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+<script>
+
+var content = {{{content}}};
+
+content = content.slice(0,-1);
+
+function row(i) {
+  return content.map(function (row) { return row[i]; });
+}
+function number(data) {
+  if (typeof data !== 'string') return;
+  return parseFloat(data.replace('$', '').replace(',', ''));
+}
+
+var data = {
+		labels : row('Dates'),
+		datasets : [
+      {
+				fillColor : "rgba(220,220,220,0.5)",
+				strokeColor : "rgba(220,220,220,0.8)",
+				highlightFill: "rgba(220,220,220,0.75)",
+				highlightStroke: "rgba(220,220,220,1)",
+				data : row('Income').map(number)
+			},
+			{
+				fillColor : "rgba(151,187,205,0.5)",
+				strokeColor : "rgba(151,187,205,0.8)",
+				highlightFill : "rgba(151,187,205,0.75)",
+				highlightStroke : "rgba(151,187,205,1)",
+				data : row('Expense').map(number).map(Math.abs)
+			}
+		]
+	};
+window.onload = function(){
+	var ctx = document.getElementById("canvas").getContext("2d");
+	window.myBar = new Chart(ctx).Bar(data, {
+		responsive : true
+	});
+}
+</script>
+</body>
+</html>
