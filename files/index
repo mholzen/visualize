@@ -1,0 +1,21 @@
+[friends](/force-directed/graph/files/data/friends.csv)
+
+[friends with groups](/force-directed/graph-from-html/html/files/data/friends.md)
+
+  * should write a function to collapse two vertices connected with a node with no label in a graph
+
+[Net worth over time](/chart/csv2json/files/private/data/mint.com/trends.csv)
+
+[Ken Burns slideshow](/slideshow/https://www.reddit.com/r/CityPorn+EarthPorn+ExposurePorn+lakeporn+wallpaper+wallpapers+windowshots/.json)
+
+[Net worth over time using d3](/templates/bars/csv2json/files/private/data/mint.com/trends.csv)
+
+[data/logs](/prefix:html/html/files/private/data/logs/)
+
+# Work In progress
+
+[synthesize](/force-directed/graph/files/data/synthesize)
+
+[synthesize html](/html/files/data/synthesize)
+
+[synthesize.simple](http://localhost:8001/templates/pretty.jade/html/files/private/data/synthesize.simple)

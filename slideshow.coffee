@@ -1,28 +1,27 @@
-module.exports =
-  method: 'GET'
-  path: '/slideshow/{uri*}'
-  handler: (request, reply) ->
-    reply.view 'slideshow',
-      uri: request.params.uri
-
 wreck = require 'wreck'
-
-
-addScheme = (uri)->
-  if uri.indexOf('http') != 0
-     uri = 'http://' + request.info.host + '/' + request.params.uri
-  return uri
+uris = require './uris'
 
 module.exports =
   method: 'GET'
   path: '/slideshow/{uri*}'
   handler: (request, reply) ->
-    uri = addScheme request.params.uri
+    if request.query.from
+      uri = request.query.from
+    else
+     uri = uris.addScheme request
+    if not uri
+      return reply.view 'slideshow'
+
+    console.log uri
     reply.proxy
       uri: uri
       onResponse: (err, res, request, reply, settings, ttl)->
         if err
           reply err
+
+        # extract images from URL
+        # '/select/images/...'
+
         wreck.read res, {json: true}, (err, payload)->
           if err
             return reply err

@@ -1,23 +1,42 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <link rel="stylesheet" href="/files/slideshow.css"></link>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <body>
+  <form action="" style="visibility: hidden">
+    <label for="from">From:</label>
+    <input id="from" name="from" type="url">
+    <input type="submit" value="Submit">
+  </form>
   <div id="slideshow">
     {{#each images}}
       <img src="{{this}}">
     {{/each}}
-  	<!-- <img src="http://lorempixel.com/800/400/">
-  	<img src="http://lorempixel.com/800/400/sports/">
-  	<img src="http://lorempixel.com/800/400/city">
-  	<img src="http://lorempixel.com/800/400/abstract">
-  	<img src="http://lorempixel.com/800/400/food">
-  	<img src="http://lorempixel.com/800/400/cats">
-  	<img src="http://lorempixel.com/800/400/business">
-  	<img src="http://lorempixel.com/800/400/animals"> -->
   </div>
 <script>
 
+// https://github.com/fengyuanchen/viewerjs
+
 (function(){
+
+  function get(name){
+     if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+        return decodeURIComponent(name[1]);
+  }
+
+  var images          = document.getElementById('slideshow').getElementsByTagName('img');
+
+  if (images.length == 0) {
+    document.getElementsByTagName('form')[0].style.visibility = 'visible';
+
+    var from = get('from');
+
+    $.get(from, function(data) {
+      // detect content
+      var html = $.parseHTML(data);
+      console.log(html);
+    });
+  }
 
 // we set the 'fx' class on the first image when the page loads
   document.getElementById('slideshow').getElementsByTagName('img')[0].className = "fx";

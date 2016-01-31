@@ -11,3 +11,4 @@ module.exports =
         wreck.read res, {json: true}, (err, payload)->
           reply.view request.params.template,
             uri: uri
+            payload: payload

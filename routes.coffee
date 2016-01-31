@@ -4,7 +4,7 @@ routes.push
   method: 'GET',
   path: '/'
   handler: (request, reply)->
-    reply.view 'index.jade'
+    reply.redirect '/html/files/index'
 
 routes.push
   method: 'GET',
@@ -97,5 +97,11 @@ routes.push
 routes.push require './slideshow'
 
 routes.push require './templates'
+
+routes.push require './filters'
+
+routes.push require './rdf'
+
+routes.push require './maps'
 
 module.exports = routes
