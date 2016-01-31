@@ -19,3 +19,7 @@
 [synthesize html](/html/files/data/synthesize)
 
 [synthesize.simple](http://localhost:8001/templates/pretty.jade/html/files/private/data/synthesize.simple)
+
+http://localhost:8001/templates/pretty.jade/html/files/private/data/synthesize.json
+
+http://localhost:8001/templates/pretty.jade/html/files/private/data/synthesize.cson
