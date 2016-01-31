@@ -9,7 +9,6 @@ routes.push
 routes.push
   method: 'GET',
   path: '/files/{param*}',
-  # should handle .cson extensions
   handler:
     directory:
       path: 'files'
@@ -61,6 +60,24 @@ routes.push
     reply.view 'force-directed',
       uri: request.params.uri,
 
+toHtml = (from)->
+  # the choice of row vs col could be made based on cardinality
+  # once made?  does it imply the alternative for the value?
+  if from instanceof Array
+    s = '<table><tr>'
+    s += from.map((item)->('<td>' + toHtml(item) + '</td>')).join('')
+    s += '</tr></table>'
+    return s
+  else if from instanceof Object
+    s = '<table>'
+    for k, v of from
+      s += '<tr><td>' + k + '</td>'
+      s += '<td>' + toHtml(v) + '</td>'
+    s += '</table>'
+    return s
+  else
+    return from.toString()
+
 routes.push
   method: 'GET'
   path: '/html/{uri*}'
@@ -69,16 +86,9 @@ routes.push
       uri: 'http://' + request.info.host + '/' + request.params.uri,
       onResponse: (err, res, request, reply, settings, ttl)->
         wreck.read res, null, (err, payload)->
-          console.log res.headers['content-type']
           if res.headers['content-type'].startsWith 'application/json'
             payload = JSON.parse payload.toString()
-            if payload instanceof Array
-              s = '<table><tr>'
-              s += payload.map((item)-> '<td>'+item+'</td>').join('')
-              s += '</tr></table>'
-              reply s
-            else
-              reply payload.toString()
+            reply toHtml payload
           else
             reply marked( payload.toString() )
 

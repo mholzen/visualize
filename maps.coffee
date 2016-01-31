@@ -33,17 +33,22 @@ routes.push
           reply null, response
 
 # maps by name
-# routes.push
-#   method: 'GET'
-#   path: '/maps/{name}/{uri*}'
-#   handler: (request, reply) ->
-#     uri =
-#     filter = filters[request.params.name]
-#     if not filter
-#       reply 404
-#     wreck.get uri, (err, response, payload)->
-#       if err
-#         reply err
-#       reply filter payload, response
+cson = require 'cson'
+
+routes.push
+  method: 'GET'
+  path: '/json/{uri*}'
+  handler: (request, reply) ->
+    reply.proxy
+      uri: uris.addScheme request
+      onResponse: (err, res, request, reply, settings, ttl)->
+        wreck.read res, null, (err, payload)->
+          if err
+            reply err
+          if request.params.uri.endsWith '.cson'
+            reply cson.parse payload.toString()
+          else
+            # weird: parsing JSON then toString() in the response
+            reply JSON.parse payload.toString()
 
 module.exports = routes
