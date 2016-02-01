@@ -12,6 +12,7 @@
 
 [data/logs](/prefix:html/html/files/private/data/logs/)
 
+
 # Work In progress
 
 [synthesize](/force-directed/graph/files/data/synthesize)
@@ -23,3 +24,5 @@
 http://localhost:8001/templates/pretty.jade/html/files/private/data/synthesize.json
 
 http://localhost:8001/templates/pretty.jade/html/files/private/data/synthesize.cson
+
+[recent bookmarks](/filters/bookmarks/json/files/private/data/bookmarks)

@@ -12,6 +12,15 @@ domImages = (document)->
   return images.map (tag)-> tag.attributes['href']
     .filter (s)-> s
 
+traverse = require 'traverse'
+jsonBookmarks = (from)->
+  json = JSON.parse from
+  results = []
+  traverse(json).forEach (item)->
+    if item?.type == 'url'
+      results.push item
+  return results
+
 filters =
   image: (payload, response)->
     type = response?.headers['content-type']
@@ -25,20 +34,27 @@ filters =
     else
       reply domImages content
 
+  bookmarks: (payload, response)->
+    return jsonBookmarks payload
+
+wreck = require 'wreck'
 
 routes = []
 routes.push
   method: 'GET'
   path: '/filters/{name}/{uri*}'
   handler: (request, reply) ->
-    uri = uris.addScheme request
     filter = filters[request.params.name]
     if not filter
-      reply 404
-    wreck.get uri, (err, response, payload)->
-      if err
-        reply err
-      reply filter payload, response
+      reply 404, "cannot find filter #{request.params.name}"
+    reply.proxy
+      uri: uris.addScheme request
+      onResponse: (err, res, request, reply, settings, ttl)->
+        wreck.read res, null, (err, payload)->
+          if err
+            reply err
+          reply filter(payload, res)
+
 
 # routes.push
 #   method: 'GET'
