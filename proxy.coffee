@@ -8,6 +8,6 @@ proxy = (request, reply, callback)->
       wreck.read res, null, (err, payload)->
         if err
           reply err
-        callback err, res, request, reply, settings, ttl
+        callback err, res, payload, request, reply, settings, ttl
 
 module.exports = proxy

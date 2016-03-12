@@ -60,38 +60,6 @@ routes.push
     reply.view 'force-directed',
       uri: request.params.uri,
 
-toHtml = (from)->
-  # the choice of row vs col could be made based on cardinality
-  # once made?  does it imply the alternative for the value?
-  if from instanceof Array
-    s = '<table><tr>'
-    s += from.map((item)->('<td>' + toHtml(item) + '</td>')).join('')
-    s += '</tr></table>'
-    return s
-  else if from instanceof Object
-    s = '<table>'
-    for k, v of from
-      s += '<tr><td>' + k + '</td>'
-      s += '<td>' + toHtml(v) + '</td>'
-    s += '</table>'
-    return s
-  else
-    return from.toString()
-
-routes.push
-  method: 'GET'
-  path: '/html/{uri*}'
-  handler: (request, reply) ->
-    reply.proxy
-      uri: 'http://' + request.info.host + '/' + request.params.uri,
-      onResponse: (err, res, request, reply, settings, ttl)->
-        wreck.read res, null, (err, payload)->
-          if res.headers['content-type'].startsWith 'application/json'
-            payload = JSON.parse payload.toString()
-            reply toHtml payload
-          else
-            reply marked( payload.toString() )
-
 routes.push
   method: 'GET'
   path: '/csv2json/{uri*}'
@@ -125,5 +93,9 @@ routes.push require './filters'
 routes.push require './rdf'
 
 routes.push require './maps'
+
+routes.push require './sort'
+
+routes.push (require './html').routes
 
 module.exports = routes

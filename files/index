@@ -23,6 +23,8 @@
 
 http://localhost:8001/templates/pretty.jade/html/files/private/data/synthesize.json
 
-http://localhost:8001/templates/pretty.jade/html/files/private/data/synthesize.cson
+http://localhost:8001/templates/pretty.jade/html/json/files/private/data/synthesize.cson
 
 [recent bookmarks](/filters/bookmarks/json/files/private/data/bookmarks)
+
+http://localhost:8001/sort/recent/filters/bookmarks/json/files/private/data/bookmarks

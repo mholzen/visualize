@@ -34,6 +34,7 @@ routes.push
 
 # maps by name
 cson = require 'cson'
+boom = require 'boom'
 
 routes.push
   method: 'GET'
@@ -46,7 +47,12 @@ routes.push
           if err
             reply err
           if request.params.uri.endsWith '.cson'
-            reply cson.parse payload.toString()
+            result = cson.parse payload.toString()
+            if result instanceof Error
+              # TODO: https://github.com/hapijs/boom#faq
+              reply boom.badData result.message + result.toString()
+            else
+              reply result
           else
             # weird: parsing JSON then toString() in the response
             reply JSON.parse payload.toString()
