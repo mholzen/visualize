@@ -108,10 +108,11 @@ toHtml = (from, context)->
   else
     return from.toString()
 
+routes = []
+
 wreck = require 'wreck'
 marked = require 'marked'
 
-routes = []
 routes.push
   method: 'GET'
   path: '/html/{uri*}'
@@ -125,6 +126,41 @@ routes.push
             reply toHtml payload
           else
             reply marked( payload.toString() )
+
+{proxy} = require './proxy'
+csvparse = require 'csv-parse'
+transform = require 'stream-transform'
+stream = require 'stream'
+
+routes.push
+  method: 'GET'
+  path: '/table/{uri*}'
+  handler: (request, reply) ->
+    proxy request, reply, (err, response)->
+      if err
+        reply err
+      if response.headers['content-type'].startsWith 'text/csv'
+        parser = csvparse
+          columns: true
+
+        transformer = transform (record, callback)->
+          cells = parser.options.columns.map (col)->"<td>#{record[col]}</td>"
+          callback null, '<tr>' + cells.join('') + '</tr>'
+
+        serialize = new stream.Transform
+          transform: (chunk, encoding, done)->
+            if not this._wroteHeaders
+              this.push '<table>' +
+                (parser.options.columns.map (col)->"<th>#{col}</th>").join ''
+              this._wroteHeaders = true
+            this.push chunk?.toString()
+            done()
+          flush: (done)->
+            this.push '</table>'
+            done()
+
+        reply response.pipe(parser).pipe(transformer).pipe(serialize)
+        .type 'text/html'
 
 module.exports =
   routes: routes

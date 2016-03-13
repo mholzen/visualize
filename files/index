@@ -28,3 +28,5 @@ http://localhost:8001/templates/pretty.jade/html/json/files/private/data/synthes
 [recent bookmarks](/filters/bookmarks/json/files/private/data/bookmarks)
 
 http://localhost:8001/sort/recent/filters/bookmarks/json/files/private/data/bookmarks
+
+http://localhost:8001/table/files/data/mint.com/transactions.csv
