@@ -140,6 +140,7 @@ routes.push
       if err
         reply err
       if response.headers['content-type'].startsWith 'text/csv'
+        # TODO: use /csv route instead?
         parser = csvparse
           columns: true
 

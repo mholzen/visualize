@@ -11,6 +11,8 @@ proxyPayload = (request, reply, callback)->
   reply.proxy
     uri: uris.addScheme request
     onResponse: (err, response, request, reply, settings, ttl)->
+      if err
+        reply err
       wreck.read response, null, (err, payload)->
         if err
           reply err

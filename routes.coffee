@@ -94,6 +94,8 @@ routes.push require './rdf'
 
 routes.push require './maps'
 
+routes.push require './transform'
+
 routes.push require './sort'
 
 routes.push (require './html').routes
