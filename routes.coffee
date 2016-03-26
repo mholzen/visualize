@@ -86,7 +86,7 @@ routes.push
 
 routes.push require './slideshow'
 
-routes.push require './templates'
+routes.push (require './templates') ...
 
 routes.push require './filters'
 
