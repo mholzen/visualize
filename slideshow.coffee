@@ -12,7 +12,6 @@ module.exports =
     if not uri
       return reply.view 'slideshow'
 
-    console.log uri
     reply.proxy
       uri: uri
       onResponse: (err, res, request, reply, settings, ttl)->

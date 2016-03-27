@@ -1,5 +1,7 @@
 [friends](/force-directed/graph/files/data/friends.csv)
 
+[bookmarks](http://localhost:8001/html/sort/recent/filters/bookmarks/json/files/private/data/bookmarks)
+
 [friends with groups](/force-directed/graph-from-html/html/files/data/friends.md)
 
   * should write a function to collapse two vertices connected with a node with no label in a graph

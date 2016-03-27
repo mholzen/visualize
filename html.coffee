@@ -1,3 +1,5 @@
+toDate = require './date'
+
 types = (from)->
   Object.keys(from)
 
@@ -30,8 +32,6 @@ types = (from)->
 
     # can we infere something from these keys?
     # results.last
-
-
 
 reduce = (from)->
   # coalesce an object into a shorter higher level object
@@ -66,6 +66,7 @@ iterate = (from)->
     order.forEach (key)->
       yield { key: from[key] }
 
+moment = require 'moment'
 
 toHtml = (from, context)->
   # the choice of row vs col could be made based on cardinality
@@ -73,7 +74,6 @@ toHtml = (from, context)->
   if from instanceof Array
     # if all items have the same structure, then extract structure into headers
     if (c = clusters(from.map (x) -> Object.keys(x))).length <= 3
-
       # display array top to bottom
       headers = c[0].key.split ','
       s = '<table><thead>'
@@ -81,7 +81,7 @@ toHtml = (from, context)->
       s += '</thead>'
       s += from.map (item)->
         r = '<tr>'
-        r += headers.map (header)-> '<td>' + toHtml(item[header]) + '</td>'
+        r += headers.map (header)-> '<td>' + toHtml(item[header], header) + '</td>'
           .join ''
         r += '</tr>'
         return r
@@ -102,10 +102,15 @@ toHtml = (from, context)->
     s = '<table>'
     for k, v of from
       s += '<tr><td>' + k + '</td>'
-      s += '<td>' + toHtml(v) + '</td>'
+      s += '<td>' + toHtml(v,k) + '</td>'
     s += '</table>'
     return s
   else
+    if context?.includes 'date'
+      from = toDate from, context
+      from = moment(from).fromNow()
+    else if from.match /^https?:/
+      from = '<a href="' + from + '">' + from[0..80] + '</a>'
     return from.toString()
 
 routes = []

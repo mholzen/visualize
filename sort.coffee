@@ -3,7 +3,7 @@
 sorters =
   recent: (payload, response)->
     content = JSON.parse payload.toString()
-    content = content.sort (a,b)-> (a.date_added < b.date_added)
+    content = content.sort (a,b)-> (parseInt(b.date_added) - parseInt(a.date_added))      # TODO: performance
     return content
 
 routes = []
