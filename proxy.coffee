@@ -13,6 +13,9 @@ proxyPayload = (request, reply, callback)->
     onResponse: (err, response, request, reply, settings, ttl)->
       if err
         reply err
+      if response.statusCode == 404
+        response.url = request.uri
+        reply response
       wreck.read response, null, (err, payload)->
         if err
           reply err

@@ -4,7 +4,7 @@ routes.push
   method: 'GET',
   path: '/'
   handler: (request, reply)->
-    reply.redirect '/html/files/index'
+    reply.redirect '/html/text/files/index'
 
 routes.push
   method: 'GET',
@@ -16,7 +16,7 @@ routes.push
 
 fs = require 'fs'
 csvparse = require 'csv-parse'
-graph = require './libs/graph'
+graph = require 'graph'
 Path = require 'path'
 
 routes.push
@@ -43,14 +43,11 @@ routes.push
   method: 'GET'
   path: '/graph-from-html/{uri*}'
   handler: (request, reply) ->
-    reply.proxy
-      uri: 'http://' + request.info.host + '/' + request.params.uri,
-      onResponse: (err, res, request, reply, settings, ttl)->
-        wreck.read res, null, (err, payload)->
-          html = marked( payload.toString() )
-          $ = cheerio.load html
-          g = graph.toGraph $
-          reply g.toJSON()
+    proxyPayload request, reply, (err, response, payload)->
+      html = marked( payload.toString() )
+      $ = cheerio.load html
+      g = graph.toGraph $
+      reply g.toJSON()
 
 
 routes.push
@@ -60,29 +57,25 @@ routes.push
     reply.view 'force-directed',
       uri: request.params.uri,
 
+{proxy, proxyPayload} = require './proxy'
+
 routes.push
   method: 'GET'
   path: '/csv2json/{uri*}'
   handler: (request, reply) ->
-    reply.proxy
-      uri: 'http://' + request.info.host + '/' + request.params.uri,
-      onResponse: (err, res, request, reply, settings, ttl)->
-        wreck.read res, null, (err, payload)->
-          csvparse payload.toString(), {columns: true}, (err, output)->
-            reply output
+    proxyPayload request, reply, (err, response, payload)->
+      csvparse payload.toString(), {columns: true}, (err, output)->
+        reply output
 
 
 routes.push
   method: 'GET'
   path: '/chart/{uri*}'
   handler: (request, reply) ->
-    reply.proxy
-      uri: 'http://' + request.info.host + '/' + request.params.uri,
-      onResponse: (err, res, request, reply, settings, ttl)->
-        wreck.read res, null, (err, payload)->
-          reply.view 'chart',
-            uri: request.params.uri
-            content: payload.toString()
+    proxyPayload request, reply, (err, response, payload)->
+      reply.view 'chart',
+        uri: request.params.uri
+        content: payload.toString()
 
 routes.push require './slideshow'
 

@@ -1,0 +1,12 @@
+filter = (response, for)->
+  if response instanceof Array
+    if typeof for == 'string'
+      callback = (item)->
+        if typeof item == 'string'
+          return item.match for
+        if item instanceof Array
+          return item.filter callback
+        if typeof item == 'object'
+          return null
+
+    response.filter callback

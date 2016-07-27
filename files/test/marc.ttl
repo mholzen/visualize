@@ -1,0 +1,5 @@
+@prefix : <http://vonholzen.org/#>.
+
+:marc :knows :laurie.
+:marc :knows :doug.
+:marc :knows :mado.

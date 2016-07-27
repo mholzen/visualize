@@ -2,41 +2,49 @@ Hapi = require 'hapi'
 Path = require 'path'
 bunyan = require 'bunyan'
 
-server = new Hapi.Server()
+class Server extends Hapi.Server
+  constructor: (options)->
+    super()
+    @connection
+      port: 8001
 
-server.connection
-  port: 8001
+    plugins = [
+      'inert'
+      'vision'
+      'h2o2'
+      ].map (plugin)-> { register: require plugin }
 
+    log = bunyan.createLogger { name: 'test', level: 'debug' }
+    plugins.push
+      register: require 'hapi-bunyan'
+      options: log
 
-plugins = [
-  'inert'
-  'vision'
-  'h2o2'
-  ].map (plugin)-> { register: require plugin }
+    @register plugins, (err) =>
 
-log = bunyan.createLogger { name: 'test', level: 'debug' }
+      @views
+        engines:
+          html:
+            module: require 'handlebars'
+            isCached: false
+          jade:
+            module: require 'jade'
+            isCached: false
+        defaultExtension: 'html'
+        # TODO: must be able to use templates from the enclosing directory
+        path: Path.join __dirname, 'templates'
 
-plugins.push
-  register: require 'hapi-bunyan'
-  options: log
+        if options?.rewrites?
+          @ext 'onRequest', (request, reply) ->
+            if (url = options.rewrites[request.path])?
+              request.setUrl url
+            # if request.path == '/'
+            #   request.setUrl '/templates/pretty.jade/html/files/home.txt'
+            reply.continue()
 
-server.register plugins, (err) =>
+      routes = require './routes'
 
-  server.views
-    engines:
-      html:
-        module: require 'handlebars'
-        isCached: false
-      jade:
-        module: require 'jade'
-        isCached: false
-    defaultExtension: 'html'
-    # TODO: must be able to use templates from the enclosing directory
-    path: Path.join __dirname, 'templates'
+      routes.forEach (route)=>
+        @route route
 
-  routes = require './routes'
-
-  routes.forEach (route)->
-    server.route route
-
-module.exports = server
+module.exports =
+  Server: Server

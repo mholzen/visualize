@@ -39,5 +39,14 @@ routes.push
       reply response.pipe(parser).pipe(transpose).pipe(stringify())
         .type('text/csv')
 
+routes.push
+  method: 'GET'
+  path: '/text/{uri*}'
+  handler: (request, reply) ->
+    proxy request, reply, (err, response)->
+      type = response.headers['content-type']
+      if type == 'application/octet-stream'
+        response.headers['content-type'] = 'text/plain'
+      reply response
 
 module.exports = routes

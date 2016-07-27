@@ -109,30 +109,30 @@ toHtml = (from, context)->
     if context?.includes 'date'
       from = toDate from, context
       from = moment(from).fromNow()
-    else if from.match /^https?:/
+    else if from?.match /^https?:/
       from = '<a href="' + from + '">' + from[0..80] + '</a>'
-    return from.toString()
+    return from?.toString()
 
 routes = []
 
 wreck = require 'wreck'
 marked = require 'marked'
+{proxy, proxyPayload} = require './proxy'
 
 routes.push
   method: 'GET'
   path: '/html/{uri*}'
   handler: (request, reply) ->
-    reply.proxy
-      uri: 'http://' + request.info.host + '/' + request.params.uri,
-      onResponse: (err, res, request, reply, settings, ttl)->
-        wreck.read res, null, (err, payload)->
-          if res.headers['content-type'].startsWith 'application/json'
-            payload = JSON.parse payload.toString()
-            reply toHtml payload
-          else
-            reply marked( payload.toString() )
+    proxyPayload request, reply, (err, response, payload)->
+      type = response.headers['content-type'] ? ''
+      if type.startsWith 'application/json'
+        payload = JSON.parse payload.toString()
+        reply toHtml payload
+      else if type.startsWith 'text/plain'
+        reply marked( payload.toString() )
+      else
+        reply(payload).headers = response.headers
 
-{proxy} = require './proxy'
 csvparse = require 'csv-parse'
 transform = require 'stream-transform'
 stream = require 'stream'

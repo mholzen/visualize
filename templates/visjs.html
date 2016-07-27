@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <title>Network | Label alignment</title>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.0/vis.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.0/vis.min.css" rel="stylesheet" type="text/css" />
+
+  <style type="text/css">
+    #mynetwork {
+      width: 600px;
+      height: 600px;
+      border: 1px solid lightgray;
+    }
+    p {
+      max-width:600px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="mynetwork"></div>
+
+<script type="text/javascript">
+  $.getJSON("{{uri}}", function (payload) {
+    var container = document.getElementById('mynetwork');
+    var data = {
+      nodes: payload.nodes,
+      edges: payload.edges
+    };
+    var options = {};
+    var network = new vis.Network(container, data, options);
+  });
+</script>
+
+</body>
+</html>
