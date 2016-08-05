@@ -1,0 +1,12 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <> .
+
+<1> <2> "foo is a literal" .
+
+<2> <1> "bar" .
+
+:marc rdf:label "Marc" .
+
+:laurie rdf:label "Laurie" .
+
+:marc :likes :laurie .

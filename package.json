@@ -37,7 +37,7 @@
     "start": "forever -a -c coffee start start.coffee",
     "stop": "forever -a stop start.coffee",
     "watch": "forever --debug -v -a -w --watchIgnore files -c coffee start.coffee",
-    "log": "forever logs start.coffee"
+    "log": "forever logs -f start.coffee"
   },
   "author": "",
   "license": "BSD-2-Clause"

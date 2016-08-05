@@ -34,8 +34,7 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("/{{uri}}", function(error, graph) {
-  console.log(error, graph);
+function render(graph) {
   force
       .nodes(graph.nodes)
       .links(graph.links)
@@ -43,7 +42,7 @@ d3.json("/{{uri}}", function(error, graph) {
 
   var link = svg.selectAll(".link")
       .data(graph.links)
-    .enter().append("line")
+      .enter().append("line")
       .attr("class", "link")
       .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
@@ -93,6 +92,15 @@ d3.json("/{{uri}}", function(error, graph) {
 
     node.attr("transform", function(d){return "translate("+d.x+","+d.y+")"});
   });
-});
+}
+var graph = '{{graph}}';
+function empty(s) { return s.length == 0; }   // TODO: extract
+if (!empty(graph)) {
+  render(JSON.parse(graph));
+}
 
+d3.json("/{{uri}}", function(error, graph) {
+  if (error) console.error(error);
+  render(graph);
+});
 </script>

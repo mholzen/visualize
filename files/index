@@ -34,3 +34,12 @@ http://localhost:8001/sort/recent/filters/bookmarks/json/files/private/data/book
 http://localhost:8001/table/files/data/mint.com/transactions.csv
 
 http://localhost:8001/templates/marcvh.jade/html/files/data/marcvh/index
+
+
+# Graphs of RDF
+
+http://localhost:8001/templates/visjs/files/samples/turtle.ttl
+
+http://localhost:8001/force-directed/files/data/samples/turtle.ttl
+
+http://localhost:8001/templates/visjs/graph/files/data/friends.csv
