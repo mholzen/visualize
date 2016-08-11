@@ -42,8 +42,6 @@ routes.push (require './templates') ...
 
 routes.push require './filters'
 
-routes.push require './rdf'
-
 routes.push require './maps'
 
 routes.push require './transform'

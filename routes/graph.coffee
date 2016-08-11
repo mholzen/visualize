@@ -1,11 +1,51 @@
 routes = []
 
+d = (a)->console.log 'HERE: ' + a
+
 fs = require 'fs'
 csvparse = require 'csv-parse'
 graph = require 'graph'
 Path = require 'path'
 
 {proxy, proxyPayload} = require '../proxy'
+
+toGraph = (response, reply)->
+  type = response.headers['content-type']
+  switch
+    when type.startsWith 'text/csv'
+      parser = csvparse
+        columns: true
+      mapper = new graph.MatrixGraphMapper
+      stream = response.pipe(parser).pipe(mapper)
+      stream.on 'finish', ->
+        mapper.graph.add 'root', 'label', 'root'
+        mapper.graph.subjects().forEach (subject)->
+          mapper.graph.add 'root', 'link', subject
+        reply mapper.graph
+
+    when type.startsWith 'text/turtle'
+      wreck.read response, null, (err, payload)->
+        if err
+          reply err
+        turtleParser = new graph.rdf.TurtleParser
+        turtleParser.parse payload, (g)->
+          if not g?
+            reply 'turtleParser error'
+          else
+            reply graph.toGraph g
+
+    when type.startsWith 'text/html'
+      wreck.read response, null, (err, payload)->
+        if err
+          reply err
+        html = marked( payload.toString() )
+        $ = cheerio.load html
+        reply graph.toGraph $
+
+
+    else
+      reply "cannot convert '#{type}' to graph"
+
 
 routes.push
   method: 'GET'
@@ -29,7 +69,7 @@ routes.push
           wreck.read response, null, (err, payload)->
             if err
               reply err
-            turtleParser = new rdf.TurtleParser
+            turtleParser = new graph.rdf.TurtleParser
             turtleParser.parse payload, (graph)->
               if not graph?
                 reply 'turtleParser error'
@@ -37,6 +77,15 @@ routes.push
                 graph = toGraph graph
                 reply graph.toJSON()
                 response.graph = graph # trying to save the graph for other handlers
+
+        when type.startsWith 'text/html'
+          wreck.read response, null, (err, payload)->
+            if err
+              reply err
+            html = marked( payload.toString() )
+            $ = cheerio.load html
+            g = graph.toGraph $
+            reply g.toJSON()
 
         else
           reply "doesn't know how to convert #{type} to graph"
@@ -58,20 +107,28 @@ routes.push
       reply g.toJSON()
 
 
-{toGraph, rdf} = require 'graph'
-
 routes.push
   method: 'GET'
   path: '/nodes-edges/{uri*}'
   handler: (request, reply) ->
-    proxyPayload request, reply, (err, response, payload)->
-      if response.headers['content-type'].startsWith 'text/turtle'
-        turtleParser = new rdf.TurtleParser
-        turtleParser.parse payload, (graph)->
-          if not graph?
-            reply 'turtleParser error'
-          else
-            reply toGraph(graph).toNodesEdges()
+    proxy request, reply, (err, response)->
+      toGraph response, (g)->
+        if g instanceof graph.Graph
+          reply g.toNodesEdges()
+        else
+          reply(g).code(404) # error
+
+routes.push
+  method: 'GET'
+  path: '/rdf/{uri*}'
+  handler: (request, reply) ->
+    proxy request, reply, (err, response)->
+      toGraph response, (g)->
+        if g instanceof graph.Graph
+          reply g.graph.toArray().map (t)->t.to
+        else
+          reply(g).code(404) # error
+
 
 routes.push
   method: 'GET'

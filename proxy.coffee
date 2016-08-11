@@ -4,6 +4,7 @@ wreck = require 'wreck'
 proxy = (request, reply, callback)->
   reply.proxy
     uri: uris.addScheme request
+    localStatePassThrough: true
     onResponse: (err, response, request, reply, settings, ttl)->
       if response.statusCode == 404
         # how to augment the error with the uri?
@@ -15,6 +16,7 @@ proxy = (request, reply, callback)->
 proxyPayload = (request, reply, callback)->
   reply.proxy
     uri: uris.addScheme request
+    localStatePassThrough: true
     onResponse: (err, response, request, reply, settings, ttl)->
       if err
         reply err

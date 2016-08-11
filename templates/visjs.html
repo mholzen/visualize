@@ -20,7 +20,7 @@
 </head>
 
 <body>
-
+<a href="{{uri}}">source</a>
 <div id="mynetwork"></div>
 
 <script type="text/javascript">
@@ -35,7 +35,7 @@ function render(payload) {
     return from
   }
   payload.nodes.forEach(function(node) {
-    node.label = node['http://www.w3.org/1999/02/22-rdf-syntax-ns#label'];
+    node.label = node.label || node['http://www.w3.org/1999/02/22-rdf-syntax-ns#label'];
     if (!node.label) {
       node.label = short(node.uri);
     }

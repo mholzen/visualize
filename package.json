@@ -34,10 +34,11 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "forever -a -c coffee start start.coffee",
+    "start": "forever -a -c coffee start start.coffee && open http://localhost:8001",
     "stop": "forever -a stop start.coffee",
     "watch": "forever --debug -v -a -w --watchIgnore files -c coffee start.coffee",
-    "log": "forever logs -f start.coffee"
+    "log": "forever logs -f start.coffee",
+     "open": "open http://localhost:8001"
   },
   "author": "",
   "license": "BSD-2-Clause"
