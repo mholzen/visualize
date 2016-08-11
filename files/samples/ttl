@@ -10,3 +10,11 @@
 :laurie rdf:label "Laurie" .
 
 :marc :likes :laurie .
+
+:anger :effect-of [
+  :need-for :attention
+] .
+
+:G1 {
+  :a :b :c 
+}

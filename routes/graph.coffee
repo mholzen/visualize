@@ -4,7 +4,7 @@ d = (a)->console.log 'HERE: ' + a
 
 fs = require 'fs'
 csvparse = require 'csv-parse'
-graph = require 'graph'
+graph = require '../libs/graph'
 Path = require 'path'
 
 {proxy, proxyPayload} = require '../proxy'
@@ -27,12 +27,11 @@ toGraph = (response, reply)->
       wreck.read response, null, (err, payload)->
         if err
           reply err
-        turtleParser = new graph.rdf.TurtleParser
-        turtleParser.parse payload, (g)->
-          if not g?
-            reply 'turtleParser error'
+        graph.parser.parse payload.toString(), (error, triples, prefixes)->
+          if error
+            reply(error).code(404)
           else
-            reply graph.toGraph g
+            reply graph.toGraph triples
 
     when type.startsWith 'text/html'
       wreck.read response, null, (err, payload)->
