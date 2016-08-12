@@ -11,7 +11,16 @@ class Graph
       @rdfGraph = new rdf.Graph()
 
   add: (s,p,o)->
-    @rdfGraph.add new rdf.Triple rdf.NamedNode(s), rdf.NamedNode(p), rdf.Literal(o)
+    if s? and not p? and not o?
+      p = s.predicate
+      o = s.object
+      s = s.subject
+
+    s = new rdf.NamedNode(s)
+    p = new rdf.NamedNode(p)
+    o = new rdf.Literal(o)
+    triple = new rdf.Triple s, p, o
+    @rdfGraph.add triple
 
   subjects: ()->
     return Object.keys @rdfGraph.indexSOP
@@ -45,7 +54,8 @@ class Graph
     return null
 
   toRDF: ->
-    console.log @rdfGraph
+    @rdfGraph.toArray().map (t)->t.toString()
+    .join '\n'
 
   toJSON: ->
     nodes = {}

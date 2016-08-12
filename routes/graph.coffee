@@ -27,11 +27,14 @@ toGraph = (response, reply)->
       wreck.read response, null, (err, payload)->
         if err
           reply err
-        graph.parser.parse payload.toString(), (error, triples, prefixes)->
+        result = new graph.Graph()
+        graph.parser.parse payload.toString(), (error, triple, prefixes)->
           if error
             reply(error).code(404)
+          else if triple
+            result.add triple
           else
-            reply graph.toGraph triples
+            reply result
 
     when type.startsWith 'text/html'
       wreck.read response, null, (err, payload)->
@@ -123,8 +126,12 @@ routes.push
   handler: (request, reply) ->
     proxy request, reply, (err, response)->
       toGraph response, (g)->
+        console.log 'here', g
         if g instanceof graph.Graph
-          reply g.graph.toArray().map (t)->t.to
+          t = g.rdfGraph.toArray().map (t)->
+            t.toString()
+          console.log t
+          reply t.join('')
         else
           reply(g).code(404) # error
 
