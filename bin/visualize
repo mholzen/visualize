@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd ~/develop/mholzen/visualize
+npm run "$@"
