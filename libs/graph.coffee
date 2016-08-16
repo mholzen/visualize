@@ -16,9 +16,15 @@ class Graph
       o = s.object
       s = s.subject
 
-    s = new rdf.NamedNode(s)
-    p = new rdf.NamedNode(p)
-    o = new rdf.Literal(o)
+    if typeof s == 'string'
+      s = new rdf.NamedNode(s)
+
+    if typeof p == 'string'
+      p = new rdf.NamedNode(p)
+
+    if typeof o == 'number'
+      o = '"' + o.toString() + '"'
+    o = if o.startsWith '"' then new rdf.Literal(o) else new rdf.NamedNode(o)
     triple = new rdf.Triple s, p, o
     @rdfGraph.add triple
 
@@ -108,8 +114,12 @@ class MatrixGraphMapper extends stream.Writable
     @line = 0
 
   _write: (data, encoding, cb)->
+    s = new rdf.BlankNode()
     for k,v of data
-      @graph.add @line, k, v
+      #@graph.add @line, k, v
+      @graph.add s, k, v
+    @graph.add s, 'line', @line
+
     @line++
     cb()
 
@@ -173,11 +183,11 @@ toGraph = (from)->
   return graph
 
 n3 = require 'n3'
-parser = n3.Parser()
+Parser = n3.Parser
 
 module.exports =
   Graph: Graph
   MatrixGraphMapper: MatrixGraphMapper
   toGraph: toGraph
   rdf: rdf
-  parser: parser
+  Parser: Parser

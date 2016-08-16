@@ -18,9 +18,10 @@ toGraph = (response, reply)->
       mapper = new graph.MatrixGraphMapper
       stream = response.pipe(parser).pipe(mapper)
       stream.on 'finish', ->
-        mapper.graph.add 'root', 'label', 'root'
-        mapper.graph.subjects().forEach (subject)->
-          mapper.graph.add 'root', 'link', subject
+        # With root
+        # mapper.graph.add 'root', 'label', 'root'
+        # mapper.graph.subjects().forEach (subject)->
+        #   mapper.graph.add 'root', 'link', subject
         reply mapper.graph
 
     when type.startsWith 'text/turtle'
@@ -28,7 +29,8 @@ toGraph = (response, reply)->
         if err
           reply err
         result = new graph.Graph()
-        graph.parser.parse payload.toString(), (error, triple, prefixes)->
+        parser = new graph.Parser()
+        parser.parse payload.toString(), (error, triple, prefixes)->
           if error
             reply(error).code(404)
           else if triple
