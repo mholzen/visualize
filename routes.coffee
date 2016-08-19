@@ -18,6 +18,8 @@ routes.push
 
 routes.push (require './routes/graph')...
 
+routes.push (require './routes/slice')...
+
 routes.push
   method: 'GET'
   path: '/csv2json/{uri*}'
