@@ -1,3 +1,5 @@
+log = require '../log'
+
 routes = []
 
 d = (a)->console.log 'HERE: ' + a
@@ -32,7 +34,8 @@ toGraph = (response, reply)->
         parser = new graph.Parser()
         parser.parse payload.toString(), (error, triple, prefixes)->
           if error
-            reply(error).code(404)
+            log.debug error
+            reply error
           else if triple
             result.add triple
           else
