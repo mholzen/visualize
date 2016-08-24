@@ -24,7 +24,10 @@ class Graph
 
     if typeof o == 'number'
       o = '"' + o.toString() + '"'
-    o = if o.startsWith '"' then new rdf.Literal(o) else new rdf.NamedNode(o)
+
+    if typeof o == 'string'
+      o = if o.startsWith '"' then new rdf.Literal(o) else new rdf.NamedNode(o)
+
     triple = new rdf.Triple s, p, o
     @rdfGraph.add triple
 
@@ -91,6 +94,7 @@ class Graph
 
     edges = []
     @rdfGraph.forEach (triple)->
+      console.log triple.object, triple.object instanceof rdf.Literal
       if not (triple.object instanceof rdf.Literal)
         edges.push
           from: ids.indexOf nodes[triple.subject]
@@ -117,8 +121,11 @@ class MatrixGraphMapper extends stream.Writable
     s = new rdf.BlankNode()
     for k,v of data
       #@graph.add @line, k, v
+      if k == 'label'     # heuristic
+        v = new rdf.Literal v
       @graph.add s, k, v
     @graph.add s, 'line', @line
+    # @graph.add s, 'is', ''
 
     @line++
     cb()

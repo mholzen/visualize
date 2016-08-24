@@ -67,8 +67,10 @@ function render(payload) {
     if (!node.label) {
       node.label = short(node.uri);
     }
+    node.shape = 'circle';
     // addNetwork(node);
   });
+
   payload.edges.forEach(function(edge) {
     edge.arrows = 'to';
     if (edge.label)

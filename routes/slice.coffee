@@ -16,10 +16,13 @@ toSlice = (slice, response, reply)->
         columns: true
         relax_column_count: true
 
+      hasOutputHeader = false
       slicer = new Transform
         objectMode: true
         transform: (data, encoding, cb)->
-          console.log data
+          if not hasOutputHeader
+            this.push [slice]
+            hasOutputHeader = true
           data = _.pick data, slice
           this.push data
           cb()

@@ -118,12 +118,14 @@ routes.push
   method: 'GET'
   path: '/nodes-edges/{uri*}'
   handler: (request, reply) ->
-    proxy request, reply, (err, response)->
+    proxy request, reply, (err, response, request, reply)->
       toGraph response, (g)->
         if g instanceof graph.Graph
           reply g.toNodesEdges()
         else
-          reply(g).code(404) # error
+          console.log g, g instanceof Error
+          reply(g.message).code(500)
+          # reply(g) # .code(404) # error
 
 routes.push
   method: 'GET'
