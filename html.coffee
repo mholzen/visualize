@@ -128,7 +128,7 @@ routes.push
       if type.startsWith 'application/json'
         payload = JSON.parse payload.toString()
         reply toHtml payload
-      else if type.startsWith 'text/plain'
+      else if type.startsWith('text/plain') or type.startsWith('application/octet-stream')
         reply marked( payload.toString() )
       else
         reply(payload).headers = response.headers

@@ -26,7 +26,7 @@ toGraph = (response, reply)->
         #   mapper.graph.add 'root', 'link', subject
         reply mapper.graph
 
-    when type.startsWith('text/turtle') or type.startsWith('application/octet-stream')
+    when type.startsWith('text/turtle') or type.startsWith('text/plain') or type.startsWith('application/octet-stream')
       wreck.read response, null, (err, payload)->
         if err
           reply err

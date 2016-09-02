@@ -1,6 +1,6 @@
 {proxy, proxyPayload} = require './proxy'
-
 log = require './log'
+cheerio = require 'cheerio'
 
 redditImages = (listing)->
   return listing.data.children.map (child)->child.data.url
@@ -22,9 +22,9 @@ jsonBookmarks = (from)->
 filters =
   image: (payload, response)->
     type = response?.headers['content-type']
-    if type == 'application/json'
+    if type.startsWith 'application/json'
       content = JSON.parse payload
-    else if type == 'text/html'
+    else if type.startsWith 'text/html'
       content = null # htmlparser.parse payload
 
     return if response.host == 'reddit.com'
@@ -34,6 +34,13 @@ filters =
 
   bookmarks: (payload, response)->
     return jsonBookmarks payload
+
+  code: (payload, response)->
+    type = response?.headers['content-type']
+    if type.startsWith 'text/html'
+      $ = cheerio.load payload
+      $('code').toString()
+
 
 wreck = require 'wreck'
 

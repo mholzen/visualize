@@ -1,6 +1,8 @@
 {proxy} = require './proxy'
 
 csvparse = require 'csv-parse'
+cheerio = require 'cheerio'
+wreck = require 'wreck'
 
 transformers =
   transpose: (payload, response)->
@@ -45,8 +47,13 @@ routes.push
   handler: (request, reply) ->
     proxy request, reply, (err, response)->
       type = response.headers['content-type']
-      if type == 'application/octet-stream'
-        response.headers['content-type'] = 'text/plain'
-      reply response
+      if type.startsWith 'application/octet-stream'
+        reply(response).type('text/plain')
+      else if type.startsWith 'text/html'
+        wreck.read response, null, (err, payload)->
+          if err
+            return reply err
+          $ = cheerio.load payload.toString()
+          reply($.root().text()).type('text/plain')
 
 module.exports = routes
