@@ -2,6 +2,8 @@
 log = require './log'
 cheerio = require 'cheerio'
 
+require 'datejs'
+
 redditImages = (listing)->
   return listing.data.children.map (child)->child.data.url
 
@@ -41,6 +43,15 @@ filters =
       $ = cheerio.load payload
       $('code').toString()
 
+  recent: (payload, response)->
+    type = response?.headers['content-type']
+    if type.startsWith 'application/json'
+      content = JSON.parse payload
+    since = Date.today().addDays(-120).getTime()
+    c = content.filter (item)->
+      # Date.compare(Date.parse(item['Date']),since) == 1
+      (new Date(item['Date'])).getTime() > since
+    c
 
 wreck = require 'wreck'
 

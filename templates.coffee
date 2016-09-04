@@ -9,7 +9,6 @@ templates =
       uri: uri
       onResponse: (err, res, request, reply, settings, ttl)->
         wreck.read res, {json: true}, (err, payload)->
-          console.log payload
           reply.view request.params.template,
             uri: uri
             payload: payload

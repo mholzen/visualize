@@ -11,6 +11,7 @@
     "cson": "^3.0.2",
     "csv-parse": "^1.0.1",
     "csv-stringify": "^1.0.2",
+    "datejs": "^1.0.0-rc3",
     "forever": "^0.15.1",
     "h2o2": "^5.1.0",
     "handlebars": "~4.0.5",

@@ -1,4 +1,5 @@
 {proxy, proxyPayload} = require './proxy'
+log = require './log'
 
 routes = []
 
@@ -34,21 +35,24 @@ routes.push
 cson = require 'cson'
 boom = require 'boom'
 
+
+
 routes.push
   method: 'GET'
-  path: '/json/{uri*}'
+  path: '/balance/{uri*}'
   handler: (request, reply) ->
     proxyPayload request, reply, (err, response, payload)->
-      log.debug response.headers 'content-type'
-      if request.params.uri.endsWith '.cson'
-        result = cson.parse payload.toString()
-        if result instanceof Error
-          # TODO: https://github.com/hapijs/boom#faq
-          reply boom.badData result.message + result.toString()
-        else
-          reply result
-      else
-        # weird: parsing JSON then toString() in the response
-        reply JSON.parse payload.toString()
+      type = response.headers['content-type']
+      if not type.startsWith 'application/json'
+        return reply('need json').code(400)
+      payload = JSON.parse payload
+      payload = payload.sort (a,b)->Date.compare(Date.parse(a['Date']),Date.parse(b['Date']))
+      AmountTotal = 0.0
+      payload.forEach (item)->
+        Amount = parseFloat(item['Amount'])
+        AmountTotal += if item['Transaction Type'] == 'credit' then Amount else -Amount
+        item['AmountTotal'] = AmountTotal
+      reply(payload)
+
 
 module.exports = routes

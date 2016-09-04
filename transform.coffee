@@ -1,4 +1,4 @@
-{proxy} = require './proxy'
+{proxy, proxyPayload} = require './proxy'
 
 csvparse = require 'csv-parse'
 cheerio = require 'cheerio'
@@ -55,5 +55,25 @@ routes.push
             return reply err
           $ = cheerio.load payload.toString()
           reply($.root().text()).type('text/plain')
+
+routes.push
+  method: 'GET'
+  path: '/json/{uri*}'
+  handler: (request, reply) ->
+    proxyPayload request, reply, (err, response, payload)->
+      type = response.headers['content-type']
+      if type.startsWith 'text/csv'
+        csvparse payload.toString(), {columns: true}, (err, output)->
+          reply output
+      else if request.params.uri.endsWith '.cson'
+        result = cson.parse payload.toString()
+        if result instanceof Error
+          # TODO: https://github.com/hapijs/boom#faq
+          reply boom.badData result.message + result.toString()
+        else
+          reply result
+      else
+        # weird: parsing JSON then toString() in the response
+        reply JSON.parse payload.toString()
 
 module.exports = routes

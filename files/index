@@ -4,6 +4,8 @@
 
 [bookmarks](http://localhost:8001/html/sort/recent/filters/bookmarks/json/files/private/data/bookmarks)
 
+[cash flow](http://localhost:8001/templates/line-graph.html/balance/filters/recent/json/files/data/mint.com/transactions.csv)
+
 http://localhost:8001/templates/marcvh.jade/html/files/data/marcvh/index
 
 [friends with groups](/force-directed/graph-from-html/html/files/data/friends.md)

@@ -22,14 +22,7 @@ routes.push (require './routes/slice')...
 
 routes.push (require './routes/join')...
 
-routes.push
-  method: 'GET'
-  path: '/csv2json/{uri*}'
-  handler: (request, reply) ->
-    proxyPayload request, reply, (err, response, payload)->
-      csvparse payload.toString(), {columns: true}, (err, output)->
-        reply output
-
+routes.push (require './routes/tail')...
 
 routes.push
   method: 'GET'
