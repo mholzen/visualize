@@ -14,6 +14,9 @@
     p {
       max-width:600px;
     }
+    .vis-line-graph text {
+        display: none;
+    }
   </style>
 </head>
 
@@ -28,14 +31,18 @@ var DOMURL = window.URL || window.webkitURL || window;
 function render(payload) {
   var container = document.getElementById('container');
   var items = payload.map(function(item){
-    return {x: item['Date'], y: item['AmountTotal']};
+    return {x: item['Date'], y: item['AmountTotal']
+    // , label: { content: item['Amount']}
+  };
   });
   var dataset = new vis.DataSet(items);
   var graph2d = new vis.Graph2d(container, dataset);
+  // container.addEventListener('mouseover', function(event) {
+  //   var prop = graph2d.getEventProperties(event);
+  // });
 };
 
 document.addEventListener('keypress', (event) => {
-  console.log(event);
   if (event.key == 'r') $.getJSON("{{uri}}", render);
 }, false);
 

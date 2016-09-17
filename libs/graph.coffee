@@ -94,7 +94,6 @@ class Graph
 
     edges = []
     @rdfGraph.forEach (triple)->
-      console.log triple.object, triple.object instanceof rdf.Literal
       if not (triple.object instanceof rdf.Literal)
         edges.push
           from: ids.indexOf nodes[triple.subject]

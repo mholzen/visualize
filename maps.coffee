@@ -46,7 +46,9 @@ routes.push
       if not type.startsWith 'application/json'
         return reply('need json').code(400)
       payload = JSON.parse payload
-      payload = payload.sort (a,b)->Date.compare(Date.parse(a['Date']),Date.parse(b['Date']))
+      payload.forEach (item)->item['_Date']=Date.parse(item['Date'])
+      # payload = payload.sort (a,b)->Date.compare(Date.parse(a['Date']),Date.parse(b['Date']))
+      payload = payload.sort (a,b)->Date.compare(a['_Date'],b['_Date'])
       AmountTotal = 0.0
       payload.forEach (item)->
         Amount = parseFloat(item['Amount'])

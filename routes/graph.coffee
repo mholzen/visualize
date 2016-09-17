@@ -2,8 +2,6 @@ log = require '../log'
 
 routes = []
 
-d = (a)->console.log 'HERE: ' + a
-
 fs = require 'fs'
 csvparse = require 'csv-parse'
 graph = require '../libs/graph'
@@ -58,60 +56,17 @@ routes.push
   method: 'GET'
   path: '/graph/{uri*}'
   handler: (request, reply) ->
-    proxy request, reply, (err, response)->
-      type = response.headers['content-type']
-      switch
-        when type.startsWith 'text/csv'
-          parser = csvparse
-            columns: true
-          mapper = new graph.MatrixGraphMapper
-          stream = response.pipe(parser).pipe(mapper)
-          stream.on 'finish', ->
-            mapper.graph.add 'root', 'label', 'root'
-            mapper.graph.subjects().forEach (subject)->
-              mapper.graph.add 'root', 'link', subject
-            reply mapper.graph.toJSON()
-
-        when type.startsWith 'text/turtle'
-          wreck.read response, null, (err, payload)->
-            if err
-              reply err
-            turtleParser = new graph.rdf.TurtleParser
-            turtleParser.parse payload, (graph)->
-              if not graph?
-                reply 'turtleParser error'
-              else
-                graph = toGraph graph
-                reply graph.toJSON()
-                response.graph = graph # trying to save the graph for other handlers
-
-        when type.startsWith 'text/html'
-          wreck.read response, null, (err, payload)->
-            if err
-              reply err
-            html = marked( payload.toString() )
-            $ = cheerio.load html
-            g = graph.toGraph $
-            reply g.toJSON()
-
+    proxy request, reply, (err, response, request, reply)->
+      toGraph response, (g)->
+        if g instanceof graph.Graph
+          reply g.toJSON()
         else
-          reply "doesn't know how to convert #{type} to graph"
+          reply(g.message).code(500)
 
 
 wreck = require 'wreck'
 marked = require 'marked'
 cheerio = require 'cheerio'
-
-
-routes.push
-  method: 'GET'
-  path: '/graph-from-html/{uri*}'
-  handler: (request, reply) ->
-    proxyPayload request, reply, (err, response, payload)->
-      html = marked( payload.toString() )
-      $ = cheerio.load html
-      g = graph.toGraph $
-      reply g.toJSON()
 
 
 routes.push
@@ -123,7 +78,6 @@ routes.push
         if g instanceof graph.Graph
           reply g.toNodesEdges()
         else
-          console.log g, g instanceof Error
           reply(g.message).code(500)
           # reply(g) # .code(404) # error
 
@@ -133,11 +87,9 @@ routes.push
   handler: (request, reply) ->
     proxy request, reply, (err, response)->
       toGraph response, (g)->
-        console.log 'here', g
         if g instanceof graph.Graph
           t = g.rdfGraph.toArray().map (t)->
             t.toString()
-          console.log t
           reply t.join('')
         else
           reply(g).code(404) # error

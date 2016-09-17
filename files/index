@@ -1,6 +1,6 @@
 [marc](/html/text/files/marchome/data/marc)
 
-[friends](/force-directed/graph/files/data/friends.csv)
+[friends](http://localhost:8001/visjs/files/data/friends.csv)
 
 [bookmarks](http://localhost:8001/html/sort/recent/filters/bookmarks/json/files/private/data/bookmarks)
 
@@ -45,5 +45,3 @@ http://localhost:8001/templates/marcvh.jade/html/files/data/marcvh/index
 http://localhost:8001/visjs/text/filters/code/html/files/data/identity
 
 http://localhost:8001/visjs/slice/label/files/data/table.csv
-
-http://localhost:8001/visjs/files/data/friends.csv

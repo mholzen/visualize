@@ -3,6 +3,8 @@
 csvparse = require 'csv-parse'
 cheerio = require 'cheerio'
 wreck = require 'wreck'
+graph = require './libs/graph'
+log = require './log'
 
 transformers =
   transpose: (payload, response)->
@@ -75,5 +77,38 @@ routes.push
       else
         # weird: parsing JSON then toString() in the response
         reply JSON.parse payload.toString()
+
+routes.push
+  method: 'GET'
+  path: '/csv/{uri*}'
+  handler: (request, reply) ->
+    proxyPayload request, reply, (err, response, payload)->
+      type = response.headers['content-type']
+      switch
+        when type.startsWith('text/turtle')
+          result = []
+          parser = new graph.Parser()
+          parser.parse payload.toString(), (error, triple, prefixes)->
+            if error
+              log.debug error
+              reply error
+            else if triple
+              result.push [triple.subject, triple.predicate, triple.object]
+            else
+              reply result
+        else
+          reply "cannot transform #{type} to csv"
+
+
+types =
+  turtle: 'text/turtle'
+
+routes.push
+  method: 'GET'
+  path: '/types/{type}/{uri*}'
+  handler: (request, reply) ->
+    proxyPayload request, reply, (err, response, payload)->
+      type = types[request.params.type] || request.params.type
+      reply(payload.toString()).type(type)
 
 module.exports = routes

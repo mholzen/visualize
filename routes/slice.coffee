@@ -6,7 +6,7 @@ _ = require 'lodash'
 csvparse = require 'csv-parse'
 stringify = require 'csv-stringify'
 {Transform, Readable} = require 'stream'
-
+wreck = require 'wreck'
 
 toSlice = (slice, response, reply)->
   type = response.headers['content-type']
@@ -29,8 +29,18 @@ toSlice = (slice, response, reply)->
 
       reply response.pipe(parser).pipe(slicer).pipe(stringify())    # should output header
 
+    when type.startsWith 'application/json'
+      wreck.read response, null, (err, payload)->
+        content = JSON.parse payload.toString()
+        slices = content.map (row)->
+          if row instanceof Array
+            row.slice slice
+          else
+            _.pick row, slice
+        reply(JSON.stringify slices)
+
     else
-      reply "cannot convert '#{type}' to graph"
+      reply "cannot slice '#{type}'"
 
 
 routes = []

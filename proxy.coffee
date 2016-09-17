@@ -1,5 +1,6 @@
 uris = require './uris'
 wreck = require 'wreck'
+log = require './log'
 
 proxy = (request, reply, callback)->
   reply.proxy
