@@ -55,13 +55,14 @@ toGraph = (response, reply)->
 routes.push
   method: 'GET'
   path: '/graph/{uri*}'
-  handler: (request, reply) ->
-    proxy request, reply, (err, response, request, reply)->
-      toGraph response, (g)->
-        if g instanceof graph.Graph
-          reply g.toJSON()
-        else
-          reply(g.message).code(500)
+  config:
+    handler: (request, reply) ->
+      proxy request, reply, (err, response, request, reply)->
+        toGraph response, (g)->
+          if g instanceof graph.Graph
+            reply g.toJSON()
+          else
+            reply(g.message).code(500)
 
 
 wreck = require 'wreck'
@@ -72,44 +73,48 @@ cheerio = require 'cheerio'
 routes.push
   method: 'GET'
   path: '/nodes-edges/{uri*}'
-  handler: (request, reply) ->
-    proxy request, reply, (err, response, request, reply)->
-      toGraph response, (g)->
-        if g instanceof graph.Graph
-          reply g.toNodesEdges()
-        else
-          reply(g.message).code(500)
-          # reply(g) # .code(404) # error
+  config:
+    handler: (request, reply) ->
+      proxy request, reply, (err, response, request, reply)->
+        toGraph response, (g)->
+          if g instanceof graph.Graph
+            reply g.toNodesEdges()
+          else
+            reply(g.message).code(500)
+            # reply(g) # .code(404) # error
 
 routes.push
   method: 'GET'
   path: '/rdf/{uri*}'
-  handler: (request, reply) ->
-    proxy request, reply, (err, response)->
-      toGraph response, (g)->
-        if g instanceof graph.Graph
-          t = g.rdfGraph.toArray().map (t)->
-            t.toString()
-          reply t.join('')
-        else
-          reply(g).code(404) # error
+  config:
+    handler: (request, reply) ->
+      proxy request, reply, (err, response)->
+        toGraph response, (g)->
+          if g instanceof graph.Graph
+            t = g.rdfGraph.toArray().map (t)->
+              t.toString()
+            reply t.join('')
+          else
+            reply(g).code(404) # error
 
 
 routes.push
   method: 'GET'
   path: '/force-directed/{uri*}'
-  handler: (request, reply) ->
-    request.params.uri = 'graph/' + request.params.uri
-    proxy request, reply, (err, response)->
-      reply.view 'force-directed',
-        uri: request.params.uri,
+  config:
+    handler: (request, reply) ->
+      request.params.uri = 'graph/' + request.params.uri
+      proxy request, reply, (err, response)->
+        reply.view 'force-directed',
+          uri: request.params.uri,
 
 routes.push
   method: 'GET'
   path: '/visjs/{uri*}'
-  handler: (request, reply) ->
-    request.params.uri = '/nodes-edges/' + request.params.uri
-    reply.view 'visjs',
-      uri: request.params.uri,
+  config:
+    handler: (request, reply) ->
+      request.params.uri = '/nodes-edges/' + request.params.uri
+      reply.view 'visjs',
+        uri: request.params.uri,
 
 module.exports = routes

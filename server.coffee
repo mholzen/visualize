@@ -1,6 +1,7 @@
 Hapi = require 'hapi'
 Path = require 'path'
 bunyan = require 'bunyan'
+{extend} = require './helpers'
 
 class Server extends Hapi.Server
   constructor: (options)->
@@ -19,7 +20,17 @@ class Server extends Hapi.Server
       register: require 'hapi-bunyan'
       options: log
 
+    plugins.push
+      register: require 'hapi-swagger'
+      options:
+        info:
+          title: 'API'
+          version: require('./package').version
+
     @register plugins, (err) =>
+
+      if err
+        console.log err
 
       @views
         engines:
@@ -31,19 +42,22 @@ class Server extends Hapi.Server
             isCached: false
         defaultExtension: 'html'
         # TODO: must be able to use templates from the enclosing directory
-        path: Path.join __dirname, 'templates'
+        path: Path.join process.cwd(), 'templates'
 
-        if options?.rewrites?
-          @ext 'onRequest', (request, reply) ->
-            if (url = options.rewrites[request.path])?
-              request.setUrl url
-            # if request.path == '/'
-            #   request.setUrl '/templates/pretty.jade/html/files/home.txt'
-            reply.continue()
+      if options?.rewrites?
+        @ext 'onRequest', (request, reply) ->
+          if (url = options.rewrites[request.path])?
+            request.setUrl url
+          reply.continue()
 
       routes = require './routes'
 
       routes.forEach (route)=>
+        route = extend route,
+          config:
+            handler: route.config?.handler or route.handler
+            tags: ['api']
+        delete route.handler
         @route route
 
 module.exports =

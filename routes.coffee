@@ -3,18 +3,20 @@ routes = []
 routes.push
   method: 'GET',
   path: '/'
-  handler: (request, reply)->
-    reply.redirect '/html/text/files/index'
+  config:
+    handler: (request, reply)->
+      reply.redirect '/html/text/files/index'
 
 Path = require 'path'
 
 routes.push
   method: 'GET',
   path: '/files/{param*}',
-  handler:
-    directory:
-      path: Path.join __dirname, 'files'
-      listing: true
+  config:
+    handler:
+      directory:
+        path: Path.join process.cwd(), 'files'
+        listing: true
 
 routes.push (require './routes/graph')...
 
@@ -27,11 +29,12 @@ routes.push (require './routes/tail')...
 routes.push
   method: 'GET'
   path: '/chart/{uri*}'
-  handler: (request, reply) ->
-    proxyPayload request, reply, (err, response, payload)->
-      reply.view 'chart',
-        uri: request.params.uri
-        content: payload.toString()
+  config:
+    handler: (request, reply) ->
+      proxyPayload request, reply, (err, response, payload)->
+        reply.view 'chart',
+          uri: request.params.uri
+          content: payload.toString()
 
 routes.push require './slideshow'
 
