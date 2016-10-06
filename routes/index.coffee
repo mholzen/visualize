@@ -18,14 +18,6 @@ routes.push
         path: Path.join process.cwd(), 'files'
         listing: true
 
-routes.push (require './routes/graph')...
-
-routes.push (require './routes/slice')...
-
-routes.push (require './routes/join')...
-
-routes.push (require './routes/tail')...
-
 routes.push
   method: 'GET'
   path: '/chart/{uri*}'
@@ -36,10 +28,15 @@ routes.push
           uri: request.params.uri
           content: payload.toString()
 
+routes.push (require './graph')...
+
+routes.push (require './slice')...
+
+routes.push (require './join')...
+
+routes.push (require './tail')...
+
 routes.push require './slideshow'
-
-routes.push (require './templates') ...
-
 routes.push require './filters'
 
 routes.push require './maps'
@@ -48,6 +45,8 @@ routes.push require './transform'
 
 routes.push require './sort'
 
-routes.push (require './html').routes
+routes.push (require './html')...
+
+routes.push (require './templates') ...
 
 module.exports = routes

@@ -1,5 +1,5 @@
 wreck = require 'wreck'
-uris = require './uris'
+uris = require '../uris'
 
 module.exports =
   method: 'GET'

@@ -7,7 +7,7 @@ class Server extends Hapi.Server
   constructor: (options)->
     super()
     @connection
-      port: 8001
+      port: options?.port ? 8001
 
     plugins = [
       'inert'
@@ -18,7 +18,8 @@ class Server extends Hapi.Server
     log = bunyan.createLogger { name: 'test', level: 'debug' }
     plugins.push
       register: require 'hapi-bunyan'
-      options: log
+      options:
+        logger: log
 
     plugins.push
       register: require 'hapi-swagger'
@@ -50,7 +51,7 @@ class Server extends Hapi.Server
             request.setUrl url
           reply.continue()
 
-      routes = require './routes'
+      routes = require './routes/'
 
       routes.forEach (route)=>
         route = extend route,

@@ -1,5 +1,5 @@
-{proxy, proxyPayload} = require './proxy'
-log = require './log'
+{proxy, proxyPayload} = require '../proxy'
+log = require '../proxy'
 
 routes = []
 

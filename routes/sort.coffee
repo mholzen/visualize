@@ -1,4 +1,4 @@
-{proxyPayload} = require './proxy'
+{proxyPayload} = require '../proxy'
 
 sorters =
   recent: (payload, response)->

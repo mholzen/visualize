@@ -1,20 +1,20 @@
-{proxy, proxyPayload} = require './proxy'
+log = require '../log'
 
+{proxy, proxyPayload} = require '../proxy'
 csvparse = require 'csv-parse'
 cheerio = require 'cheerio'
 wreck = require 'wreck'
-graph = require './libs/graph'
-log = require './log'
+graph = require '../libs/graph'
+stringify = require 'csv-stringify'
+stream = require 'stream'
+cson = require 'cson'
+boom = require 'boom'
 
 transformers =
   transpose: (payload, response)->
     content = JSON.parse payload.toString()
     content = content.sort (a,b)-> (a.date_added < b.date_added)
     return content
-
-
-stringify = require 'csv-stringify'
-stream = require 'stream'
 
 routes = []
 routes.push
@@ -57,6 +57,8 @@ routes.push
             return reply err
           $ = cheerio.load payload.toString()
           reply($.root().text()).type('text/plain')
+      else
+        reply(response).type('text/plain')
 
 routes.push
   method: 'GET'
@@ -95,7 +97,7 @@ routes.push
             else if triple
               result.push [triple.subject, triple.predicate, triple.object]
             else
-              reply result
+              reply(stringify(result)).type('text/csv')
         else
           reply "cannot transform #{type} to csv"
 
