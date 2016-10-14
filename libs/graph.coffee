@@ -180,6 +180,20 @@ addElement = (graph, element, nodes, dom)->
     i++
 
 toGraph = (from)->
+  # TODO: duplicate of MatrixGraphMapper
+  if from instanceof Array
+    graph = new Graph()
+    # TODO: move to Graph and make recursive
+    from.forEach (row, index)->
+      if typeof row == 'string'
+        graph.add index, 'label', row
+      else if typeof row == 'object'
+        Object.keys(object).forEach (key)->
+          graph.add index, key, object[key]
+      else if row instanceof 'Array'
+        row.forEach (value, index2)->
+          graph.add index, index2, object[predicate]
+
   graph = new Graph from
   if typeof(from.root) != 'undefined'
     nodes = new MapWithDefault ->

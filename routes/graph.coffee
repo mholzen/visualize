@@ -3,7 +3,7 @@ log = require '../log'
 routes = []
 
 fs = require 'fs'
-csvparse = require 'csv-parse'
+csvparse = require '../libs/csv-parse'
 graph = require '../libs/graph'
 Path = require 'path'
 
@@ -13,8 +13,7 @@ toGraph = (response, reply)->
   type = response.headers['content-type']
   switch
     when type.startsWith 'text/csv'
-      parser = csvparse
-        columns: true
+      parser = csvparse()
       mapper = new graph.MatrixGraphMapper
       stream = response.pipe(parser).pipe(mapper)
       stream.on 'finish', ->
@@ -24,7 +23,17 @@ toGraph = (response, reply)->
         #   mapper.graph.add 'root', 'link', subject
         reply mapper.graph
 
-    when type.startsWith('text/turtle') or type.startsWith('text/plain') or type.startsWith('application/octet-stream')
+    when type.startsWith 'text/plain'
+      wreck.read response, null, (err, payload)->
+        if err
+          reply err
+        result = new graph.Graph()
+        payload.toString().match(/[^\r\n]+/g)
+        .forEach (line, i)->
+          result.add i, 'label', new graph.rdf.Literal line
+        reply result
+
+    when type.startsWith('text/turtle') or type.startsWith('application/octet-stream')
       wreck.read response, null, (err, payload)->
         if err
           reply err
@@ -58,9 +67,11 @@ routes.push
   config:
     handler: (request, reply) ->
       proxy request, reply, (err, response, request, reply)->
+
         toGraph response, (g)->
           if g instanceof graph.Graph
-            reply g.toJSON()
+            # reply g.toJSON()
+            reply(g.toRDF()).type('text/rdf')
           else
             reply(g.message).code(500)
 

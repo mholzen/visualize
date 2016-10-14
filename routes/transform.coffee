@@ -110,7 +110,21 @@ routes.push
   path: '/types/{type}/{uri*}'
   handler: (request, reply) ->
     proxyPayload request, reply, (err, response, payload)->
-      type = types[request.params.type] || request.params.type
+      type = types[request.params.type] ? request.params.type
       reply(payload.toString()).type(type)
+
+handler = (request, reply) ->
+  proxyPayload request, reply, (err, response, payload)->
+    type = types[request.params.type] ? request.params.type
+    reply(payload.toString()).type(type)
+
+routes.push
+  method: 'GET'
+  path: '/index/{uri*}'
+  handler: (request, reply) ->
+    proxyPayload request, reply, (err, response, payload)->
+      type = types[request.params.type] ? request.params.type
+      reply(payload.toString()).type(type)
+
 
 module.exports = routes

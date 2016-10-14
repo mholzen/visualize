@@ -20,7 +20,7 @@ routes.push
       else
         reply(payload).headers = response.headers
 
-csvparse = require 'csv-parse'
+csvparse = require '../libs/csv-parse'
 transform = require 'stream-transform'
 stream = require 'stream'
 
@@ -33,8 +33,7 @@ routes.push
         reply err
       if response.headers['content-type'].startsWith 'text/csv'
         # TODO: use /csv route instead?
-        parser = csvparse
-          columns: true
+        parser = csvparse()
 
         transformer = transform (record, callback)->
           cells = parser.options.columns.map (col)->"<td>#{record[col]}</td>"

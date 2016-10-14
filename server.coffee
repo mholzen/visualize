@@ -2,6 +2,7 @@ Hapi = require 'hapi'
 Path = require 'path'
 bunyan = require 'bunyan'
 {extend} = require './helpers'
+log = require './log'
 
 class Server extends Hapi.Server
   constructor: (options)->
@@ -15,7 +16,6 @@ class Server extends Hapi.Server
       'h2o2'
       ].map (plugin)-> { register: require plugin }
 
-    log = bunyan.createLogger { name: 'test', level: 'debug' }
     plugins.push
       register: require 'hapi-bunyan'
       options:

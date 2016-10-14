@@ -56,5 +56,23 @@ routes.push
         item['AmountTotal'] = AmountTotal
       reply(payload)
 
+# fsp = require 'fs-promise'
+#
+# routes.push
+#   method: 'GET'
+#   path: '/augment:files/{uri*}'
+#   handler: (request, reply) ->
+#     proxyJson request, reply, (err, response, payload)->
+#       if not payload instanceof Array
+#         reply('cannot augment non array type').type(500)
+#
+#       Promises.all
+#         payload.map (item)->
+#           fsp.stat('files/'+item)
+#           .then (response)->1
+#           .catch (err)->0
+#       .forEach (response)->
+
+
 
 module.exports = routes

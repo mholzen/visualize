@@ -13,9 +13,9 @@ routes.push
       onResponse: (err, res, request, reply, settings, ttl)->
         wreck.read res, {json: true}, (err, payload)->
           if err
-            console.log err
-          console.log request.params.template
-          r = reply.view request.params.template,
+            log.error err
+            return reply err
+          reply.view request.params.template,
             uri: uri
             payload: payload
             content: payload.toString()
@@ -28,14 +28,15 @@ pug = require 'pug'
 
 routes.push
   method: 'GET'
-  path: '/pug/{uri*}'
+  path: '/pug/{template*}'
   handler: (request, reply) ->
-    proxyPayload request, reply, (err, response, payload)->
-      template = pug.compile payload
+    request.params.uri = request.params.template
+    proxyPayload request, reply, (err, response, template)->
+      template = pug.compile template,
+        filename: request.params.uri
       urls = []
       template
         get: (url)->urls.push expand(url, request.info.host)
-      log.debug urls, 'here'
 
       Promise.all urls.map (url)->rp url
       .then (contents)->

@@ -48,6 +48,9 @@ function render(payload) {
       node.label = short(node.uri);
     }
     node.shape = 'circle';
+    // node.font = {size: 20};
+    node.size = 100;
+    // node.color = 'red';
   });
 
   payload.edges.forEach(function(edge) {
