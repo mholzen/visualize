@@ -41,9 +41,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "forever -a -c coffee start start.coffee && open http://localhost:8001",
+    "start": "forever -a -c coffee start start.coffee",
     "stop": "forever -a stop start.coffee",
-    "watch": "forever --debug -v -a -w --watchIgnore files -c coffee start.coffee",
+    "watch": "forever --debug -v -a -w --watchIgnore 'files/**' -c coffee start.coffee",
     "log": "forever logs -f start.coffee",
     "open": "open http://localhost:8001"
   },
