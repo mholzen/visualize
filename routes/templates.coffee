@@ -18,7 +18,7 @@ routes.push
           reply.view request.params.template,
             uri: uri
             payload: payload
-            content: payload.toString()
+            content: payload?.toString()
             get: (url)->'GET ' + url
 
 {proxy, proxyPayload} = require '../proxy'
