@@ -109,7 +109,7 @@ toHtml = (from, context)->
     if context?.includes 'date'
       from = toDate from, context
       from = moment(from).fromNow()
-    else if from?.match /^https?:/
+    else if from?.match? and from?.match /^https?:/
       from = '<a href="' + from + '">' + from[0..80] + '</a>'
     return from?.toString()
 

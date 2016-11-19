@@ -1,4 +1,7 @@
 expand = (uri, host)->
+  if uri.match /^\w+\.\w+$/
+    host = uri
+    uri = ''
   if uri.indexOf('http') != 0
      uri = 'http://' + host + '/' + uri
   return uri

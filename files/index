@@ -1,12 +1,21 @@
 [marc](/html/text/files/marchome/data/marc)
 
-[friends](http://localhost:8001/visjs/files/data/friends.csv)
+[people recent](http://localhost:8001/visjs/csv/text/files/data/people/recent)
 
 [bookmarks](http://localhost:8001/html/sort/recent/filters/bookmarks/json/files/private/data/bookmarks)
 
+[friends](http://localhost:8001/visjs/files/data/friends.csv)
+
+
+## Finance
+
 [cash flow](http://localhost:8001/templates/line-graph.html/balance/filters/recent/json/files/data/mint.com/transactions.csv)
 
-http://localhost:8001/templates/marcvh.jade/html/files/data/marcvh/index
+[utilities](/html/files/data/utilities)
+
+# Work in Progress
+
+[vonholzen.org  inside visualize - template get absolute path](http://localhost:8001/pug/files/data/vonholzen.org.site/files/private/table.pug)
 
 [friends with groups](/force-directed/graph-from-html/html/files/data/friends.md)
 
@@ -19,9 +28,6 @@ http://localhost:8001/templates/marcvh.jade/html/files/data/marcvh/index
 [Net worth over time using d3](/templates/bars/csv2json/files/private/data/mint.com/trends.csv)
 
 [data/logs](/prefix:html/html/files/private/data/logs/)
-
-
-# Work In progress
 
 [synthesize](/templates/pretty.jade/html/text/files/data/synthesize)
 

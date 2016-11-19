@@ -9,6 +9,8 @@ stringify = require 'csv-stringify'
 stream = require 'stream'
 cson = require 'cson'
 boom = require 'boom'
+client = require 'request-promise'
+uris = require '../uris'
 
 transformers =
   transpose: (payload, response)->
@@ -66,9 +68,21 @@ routes.push
   handler: (request, reply) ->
     proxyPayload request, reply, (err, response, payload)->
       type = response.headers['content-type']
-      if type.startsWith 'text/csv'
+      if type.startsWith('text/csv')
         csvparse payload.toString(), {columns: true}, (err, output)->
           reply output
+      else if type.startsWith 'text/html'
+        $ = cheerio.load payload.toString()
+        if request.params.uri.endsWith '/'
+          response =
+            $('li')
+              .map (i, el)->
+                $(this).text()
+              .get()
+        else
+          response = "should convert html to json"
+        reply(JSON.stringify(response)).type('application/json')
+
       else if request.params.uri.endsWith '.cson'
         result = cson.parse payload.toString()
         if result instanceof Error
@@ -76,9 +90,11 @@ routes.push
           reply boom.badData result.message + result.toString()
         else
           reply result
-      else
+      else if type.startsWith('application/json' ) or type.startsWith('application/octet-stream')
         # weird: parsing JSON then toString() in the response
         reply JSON.parse payload.toString()
+      else
+        reply("cannot convert #{type} to json").code(500)
 
 routes.push
   method: 'GET'
@@ -98,16 +114,20 @@ routes.push
               result.push [triple.subject, triple.predicate, triple.object]
             else
               reply(stringify(result)).type('text/csv')
+        when type.startsWith('text/plain')
+          # consider rerwite /type/csv
+          reply(payload).type('text/csv')
         else
           reply "cannot transform #{type} to csv"
 
 
 types =
   turtle: 'text/turtle'
+  csv: 'text/csv'
 
 routes.push
   method: 'GET'
-  path: '/types/{type}/{uri*}'
+  path: '/types:{type}/{uri*}'
   handler: (request, reply) ->
     proxyPayload request, reply, (err, response, payload)->
       type = types[request.params.type] ? request.params.type
@@ -126,5 +146,69 @@ routes.push
       type = types[request.params.type] ? request.params.type
       reply(payload.toString()).type(type)
 
+
+httpHandler = (method, request, reply)->
+  client
+    method: method
+    uri: uris.addScheme request
+  .then (response)->
+    reply response
+  .catch (error)->
+    reply error
+
+httpToStream = (method, request, stream)->
+  client
+    method: method
+    uri: uris.addScheme request
+  .then (response)->
+    stream.write response
+  .catch (error)->
+    stream.write error
+
+
+routes.push
+  method: 'GET'
+  path: '/http:{method}/{uri*}'
+  handler: (request, reply) ->
+    httpHandler request.params.method, request, reply
+
+
+csvparse = require '../libs/csv-parse'
+{Transform} = require 'stream'
+
+routes.push
+  method: 'GET'
+  path: '/map/http:{method}/{uri*}'
+  handler: (request, reply) ->
+    f = (uri, request, stream)->
+      request.uri = uri
+      httpHandler request.params.method, request, reply
+
+    proxy request, reply, (err, response)->
+      type = response?.headers['content-type']
+      if type.startsWith 'text/csv'
+        parser = csvparse()
+        mapper = new Transform
+          objectMode: true
+          transform: (data, encoding, cb)->
+
+            cb()
+        reply(response.pipe(parser).pipe(mapper))
+      else
+        reply "cannot convert #{type} to iterator"
+
+routes.push
+  method: 'GET'
+  path: '/prefix2:{path}/{uri*}'
+  handler: (request, reply) ->
+    proxyPayload request, reply, (err, response, payload)->
+      switch
+        when type.startsWith('text/html')
+          $ = cheerio.load payload.toString()
+          $('a').each (i,elem)->
+            $(this).attr('href', request.params.prefix + $(this).attr('href'))
+          reply($.html())
+        else
+          reply "cannot prefix #{type}"
 
 module.exports = routes

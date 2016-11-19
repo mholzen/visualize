@@ -9,6 +9,7 @@ wreck = require 'wreck'
 
 routes.push
   method: 'GET'
+  # map of href's in a collection
   path: '/prefix:{prefix}/{uri*}'
   handler: (request, reply) ->
     proxy request, reply, (err, res, request, reply, settings, ttl)->

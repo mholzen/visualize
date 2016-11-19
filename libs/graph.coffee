@@ -26,7 +26,11 @@ class Graph
       o = '"' + o.toString() + '"'
 
     if typeof o == 'string'
-      o = if o.startsWith '"' then new rdf.Literal(o) else new rdf.NamedNode(o)
+      o =
+        if (p.toString() == 'color') or (p.toString() == 'shape') or (p.toString() == 'image') or (o.startsWith '"')
+          new rdf.Literal(o)
+        else
+          new rdf.NamedNode(o)
 
     triple = new rdf.Triple s, p, o
     @rdfGraph.add triple

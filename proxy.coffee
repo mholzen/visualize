@@ -21,6 +21,8 @@ proxyPayload = (request, reply, callback)->
     onResponse: (err, response, request, reply, settings, ttl)->
       if err
         reply err
+      if not response?
+        log.error 'no response', {uri: request.params.uri}
       if response.statusCode == 404
         response.url = request.uri
         return reply response

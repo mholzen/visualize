@@ -22,6 +22,7 @@
     "htmlparser2": "^3.9.0",
     "inert": "^4.0.2",
     "jade": "~1.11.0",
+    "jstransformer-babel": "^2.1.0",
     "lodash": "^4.15.0",
     "marked": "~0.3.2",
     "moment": "^2.12.0",
@@ -43,7 +44,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "forever -a -c coffee start start.coffee",
     "stop": "forever -a stop start.coffee",
-    "watch": "forever --debug -v -a -w --watchIgnore 'files/**' -c coffee start.coffee",
+    "watch": "forever --debug -v -a -w --watchIgnore 'files/**' -c coffee start.coffee | bunyan",
     "log": "forever logs -f start.coffee",
     "open": "open http://localhost:8001"
   },
