@@ -124,7 +124,7 @@ routes.push
   path: '/visjs/{uri*}'
   config:
     handler: (request, reply) ->
-      request.params.uri = '/nodes-edges/' + request.params.uri
+      request.params.uri = '/nodes-edges/prefix:ttl/' + request.params.uri
       reply.view 'visjs',
         uri: request.params.uri,
 

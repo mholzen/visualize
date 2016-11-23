@@ -211,4 +211,12 @@ routes.push
         else
           reply "cannot prefix #{type}"
 
+routes.push
+  method: 'GET'
+  path: '/prefix:ttl/{uri*}'
+  handler: (request, reply) ->
+    proxyPayload request, reply, (err, response, payload)->
+      reply("@prefix : <>.\n" + payload.toString()).type(response?.headers['content-type'])
+
+
 module.exports = routes

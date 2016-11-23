@@ -7,7 +7,14 @@ routes.push
   method: 'GET'
   path: '/join/{urls*}'
   handler: (request, reply) ->
-    urls = request.params.urls.split ','
+    urls = request.params.urls
+    if urls.endsWith '/'
+      uri = uris.expand urls, request.info.host
+      rp.get uri: uri
+      .then (content)->
+        log.debug 'should extract url from ' + content
+    else
+      urls = request.params.urls.split ','
     log.debug 'split urls', urls
     requests = urls.map (url)->
       url = uris.expand url, request.info.host
