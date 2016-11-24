@@ -5,6 +5,8 @@ log = require './log'
 proxy = (request, reply, callback)->
   reply.proxy
     uri: uris.addScheme request
+    passThrough: true
+    acceptEncoding: false
     localStatePassThrough: true
     onResponse: (err, response, request, reply, settings, ttl)->
       if response.statusCode == 404
@@ -17,6 +19,8 @@ proxy = (request, reply, callback)->
 proxyPayload = (request, reply, callback)->
   reply.proxy
     uri: uris.addScheme request
+    passThrough: true
+    acceptEncoding: false
     localStatePassThrough: true
     onResponse: (err, response, request, reply, settings, ttl)->
       if err

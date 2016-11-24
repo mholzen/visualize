@@ -13,6 +13,7 @@ toGraph = (response, reply)->
   type = response.headers['content-type']
   switch
     when type.startsWith 'text/csv'
+      log.debug 'HERE', response.headers
       parser = csvparse()
       mapper = new graph.MatrixGraphMapper
       stream = response.pipe(parser).pipe(mapper)
@@ -66,8 +67,8 @@ routes.push
   path: '/graph/{uri*}'
   config:
     handler: (request, reply) ->
+      request.params.uri = 'prefix:ttl/' + request.params.uri
       proxy request, reply, (err, response, request, reply)->
-
         toGraph response, (g)->
           if g instanceof graph.Graph
             # reply g.toJSON()
@@ -86,19 +87,20 @@ routes.push
   path: '/nodes-edges/{uri*}'
   config:
     handler: (request, reply) ->
+      request.params.uri = 'prefix:ttl/' + request.params.uri
       proxy request, reply, (err, response, request, reply)->
         toGraph response, (g)->
           if g instanceof graph.Graph
             reply g.toNodesEdges()
           else
             reply(g.message).code(500)
-            # reply(g) # .code(404) # error
 
 routes.push
   method: 'GET'
   path: '/rdf/{uri*}'
   config:
     handler: (request, reply) ->
+      request.params.uri = '/prefix:ttl/' + request.params.uri
       proxy request, reply, (err, response)->
         toGraph response, (g)->
           if g instanceof graph.Graph
@@ -124,7 +126,7 @@ routes.push
   path: '/visjs/{uri*}'
   config:
     handler: (request, reply) ->
-      request.params.uri = '/nodes-edges/prefix:ttl/' + request.params.uri
+      request.params.uri = '/nodes-edges/' + request.params.uri
       reply.view 'visjs',
         uri: request.params.uri,
 

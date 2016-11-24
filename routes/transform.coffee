@@ -202,6 +202,7 @@ routes.push
   path: '/prefix2:{path}/{uri*}'
   handler: (request, reply) ->
     proxyPayload request, reply, (err, response, payload)->
+      type = response?.headers['content-type']
       switch
         when type.startsWith('text/html')
           $ = cheerio.load payload.toString()
@@ -216,7 +217,12 @@ routes.push
   path: '/prefix:ttl/{uri*}'
   handler: (request, reply) ->
     proxyPayload request, reply, (err, response, payload)->
-      reply("@prefix : <>.\n" + payload.toString()).type(response?.headers['content-type'])
-
+      type = response?.headers['content-type']
+      if type.startsWith('text/turtle')
+        reply("@prefix : <>.\n" + payload.toString()).type(response?.headers['content-type'])
+      else
+        # even though we are setting passThrough, because we are using an onResponse
+        # we are not setting all headers on the response
+        reply(payload.toString()).type(type)
 
 module.exports = routes
