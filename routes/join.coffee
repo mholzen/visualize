@@ -10,12 +10,12 @@ routes.push
     arg = request.params.arg
 
     urls = if arg.endsWith '/'
-      arg = '/search:href/' + arg
+      arg = 'search:href/' + arg
       uri = uris.expand arg, request.info.host
       rp.get uri: uri
       .then (body)->
         log.debug 'should extract url from ' + body
-        urls = body
+        urls = JSON.parse body
         urls
     else
       urls = request.params.args.split ','
@@ -23,8 +23,13 @@ routes.push
 
     urls.then (urls)->
       log.debug 'urls:', urls
+
+      # do not recurse, so filter urls that are collections
+      urls = urls.filter (url)->not url.endsWith '/'
+
       requests = urls.map (url)->
         url = uris.expand url, request.info.host
+        log.debug 'get '+url
         rp.get
           uri: url
           resolveWithFullResponse: true
