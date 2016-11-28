@@ -29,24 +29,18 @@ routes.push
           content: payload.toString()
 
 routes.push (require './graph')...
-
 routes.push (require './slice')...
-
 routes.push (require './join')...
-
 routes.push (require './tail')...
 
 routes.push require './slideshow'
 routes.push require './filters'
-
 routes.push require './maps'
-
 routes.push require './transform'
-
 routes.push require './sort'
 
 routes.push (require './html')...
-
+routes.push (require './search')...
 routes.push (require './templates') ...
 
 module.exports = routes

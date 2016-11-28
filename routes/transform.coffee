@@ -81,6 +81,7 @@ routes.push
               .get()
         else
           response = "should convert html to json"
+
         reply(JSON.stringify(response)).type('application/json')
 
       else if request.params.uri.endsWith '.cson'
@@ -224,5 +225,7 @@ routes.push
         # even though we are setting passThrough, because we are using an onResponse
         # we are not setting all headers on the response
         reply(payload.toString()).type(type)
+
+
 
 module.exports = routes
