@@ -25,7 +25,12 @@ routes.push
       log.debug 'urls:', urls
 
       # do not recurse, so filter urls that are collections
-      urls = urls.filter (url)->not url.endsWith '/'
+      # urls = urls.filter (url)->not url.endsWith '/'
+
+      urls = urls.map (url)->
+        (if url.endsWith '/' then '/search:href' else '') + url
+
+      log.debug 'after recurse', urls: urls
 
       requests = urls.map (url)->
         url = uris.expand url, request.info.host

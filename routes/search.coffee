@@ -13,8 +13,10 @@ routes.push
       type = response?.headers['content-type']
       if type.startsWith('text/html')
         $ = cheerio.load payload
-        result = $('a').map ()->$(this).attr('href')
-        reply(JSON.stringify(result.get())).type('application/json')
+        results = $('a').map( ()->$(this).attr('href')).get()
+        results = results.filter (url)->
+          url.startsWith('.') or url.startsWith('/'+request.params.uri)
+        reply(JSON.stringify(results)).type('application/json')
       else
         reply("cannot search in #{type}").code(400)
 

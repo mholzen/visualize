@@ -43,4 +43,18 @@ routes.push (require './html')...
 routes.push (require './search')...
 routes.push (require './templates') ...
 
+routes.push
+  method: 'GET'
+  path: '/routes'
+  config:
+    handler: (request, reply) ->
+      reply routes
+
+routes.push
+  method: 'GET'
+  path: '/routes/paths'
+  config:
+    handler: (request, reply) ->
+      reply routes.map((route)->route.path).sort()
+
 module.exports = routes
