@@ -34,7 +34,8 @@
     "stream-transform": "^0.1.1",
     "traverse": "^0.6.6",
     "vision": "^4.0.1",
-    "wreck": "~10.0.0"
+    "wreck": "~10.0.0",
+    "yamljs": "^0.2.8"
   },
   "devDependencies": {
     "coffeetape": "^1.0.1",

@@ -11,6 +11,7 @@ cson = require 'cson'
 boom = require 'boom'
 client = require 'request-promise'
 uris = require '../uris'
+yaml = require 'yamljs'
 
 transformers =
   transpose: (payload, response)->
@@ -68,34 +69,37 @@ routes.push
   handler: (request, reply) ->
     proxyPayload request, reply, (err, response, payload)->
       type = response.headers['content-type']
-      if type.startsWith('text/csv')
-        csvparse payload.toString(), {columns: true}, (err, output)->
-          reply output
-      else if type.startsWith 'text/html'
-        $ = cheerio.load payload.toString()
-        if request.params.uri.endsWith '/'
-          response =
-            $('li')
-              .map (i, el)->
-                $(this).text()
-              .get()
-        else
-          response = "should convert html to json"
+      switch
+        when type.startsWith('text/csv')
+          csvparse payload.toString(), {columns: true}, (err, output)->
+            reply output
+        when type.startsWith('text/html')
+          $ = cheerio.load payload.toString()
+          if request.params.uri.endsWith '/'
+            response =
+              $('li')
+                .map (i, el)->
+                  $(this).text()
+                .get()
+            reply(JSON.stringify(response)).type('application/json')
+          else
+            response = "should convert html to json"
 
-        reply(JSON.stringify(response)).type('application/json')
+        when type.startsWith('application/x-yaml')
+          reply(yaml.parse(payload.toString())).type('application/json')
 
-      else if request.params.uri.endsWith '.cson'
-        result = cson.parse payload.toString()
-        if result instanceof Error
-          # TODO: https://github.com/hapijs/boom#faq
-          reply boom.badData result.message + result.toString()
+        when request.params.uri.endsWith '.cson'
+          result = cson.parse payload.toString()
+          if result instanceof Error
+            # TODO: https://github.com/hapijs/boom#faq
+            reply boom.badData result.message + result.toString()
+          else
+            reply result
+        when type.startsWith('application/json' ) or type.startsWith('application/octet-stream')
+          # weird: parsing JSON then toString() in the response
+          reply JSON.parse payload.toString()
         else
-          reply result
-      else if type.startsWith('application/json' ) or type.startsWith('application/octet-stream')
-        # weird: parsing JSON then toString() in the response
-        reply JSON.parse payload.toString()
-      else
-        reply("cannot convert #{type} to json").code(500)
+          reply("cannot convert #{type} to json").code(500)
 
 routes.push
   method: 'GET'
@@ -125,6 +129,7 @@ routes.push
 types =
   turtle: 'text/turtle'
   csv: 'text/csv'
+  yaml: 'application/x-yaml'
 
 routes.push
   method: 'GET'

@@ -203,7 +203,7 @@ toGraph = (from)->
     nodes = new MapWithDefault ->
       return new rdf.BlankNode()
     element = from.root()
-    addElement graph, element, nodes, dom
+    addElement graph, element, nodes
   return graph
 
 n3 = require 'n3'
