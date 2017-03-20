@@ -5,13 +5,13 @@ table {
 }
 
 td {
-  /*border: solid 1pt black;*/
+  border: solid 1pt black;
   text-align: center;
   font-size: 12pt;
   /*height: 500pt;*/
 }
 
-h1, h2, h3, p, li {
+h1, h2, h3, p, li, table {
   /*font-family: 'Noto Serif';*/
   font-family: 'Lora';
 }

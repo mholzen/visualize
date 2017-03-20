@@ -9,7 +9,7 @@ sorters =
 routes = []
 routes.push
   method: 'GET'
-  path: '/sort/{name}/{uri*}'
+  path: '/sort:{name}/{uri*}'
   handler: (request, reply) ->
     sorter = sorters[request.params.name]
     if not sorter

@@ -13,7 +13,6 @@ toGraph = (response, reply)->
   type = response.headers['content-type']
   switch
     when type.startsWith 'text/csv'
-      log.debug 'HERE', response.headers
       parser = csvparse()
       mapper = new graph.MatrixGraphMapper
       stream = response.pipe(parser).pipe(mapper)

@@ -1,11 +1,13 @@
 {proxy, proxyPayload} = require '../proxy'
-log = require '../proxy'
+log = require '../log'
 
 routes = []
 
 {Parser} = require 'htmlparser2'
-{Writable} = require 'stream'
+{Writable, Transform} = require 'stream'
+{toObjectStream} = require '../libs/stream'
 wreck = require 'wreck'
+uris = require '../uris'
 
 routes.push
   method: 'GET'
@@ -74,6 +76,33 @@ routes.push
 #           .catch (err)->0
 #       .forEach (response)->
 
+
+rp = require 'request-promise'
+routes.push
+  method: 'GET'
+  path: '/map:{function}/{uri*}'
+  handler: (request, reply) ->
+    proxy request, reply, (err, response)->
+      stream = toObjectStream response
+
+      mapper = new Transform
+        readableObjectMode: false
+        writableObjectMode: true
+        transform: (data, encoding, cb)->
+          url = '/' + request.params.function
+          url = uris.expand url, request.info.host
+          log.debug url: url, payload: data, 'posting'
+          rp
+            method: 'POST'
+            uri: url
+            body: JSON.stringify(data)
+          .then (body)->
+            log.debug body: body, 'received from post'
+            cb(null, body + '\n')
+          .catch (err)->
+            log.error err: err, 'ERR'
+
+      reply(stream.pipe(mapper)).type('text/csv')
 
 
 module.exports = routes

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>Network | Label alignment</title>
+  <title>{{uri}}</title>
 
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.0/vis.min.js"></script>
@@ -64,7 +64,12 @@ function render(payload) {
     nodes: payload.nodes,
     edges: payload.edges
   };
-  var options = {layout:{randomSeed: 3}};
+  var options = {
+    layout: {
+      // hierarchical: 'ud',
+      randomSeed: 3
+    }
+  };
   var network = new vis.Network(container, data, options);
 };
 

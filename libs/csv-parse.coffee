@@ -1,6 +1,7 @@
 csvparse = require 'csv-parse'
+_ = require 'lodash'
 
 module.exports = (options)->
-  parser = csvparse
-    columns: options?.columns ? true
-    relax_column_count: options?.relax_column_count ? true
+  csvparse _.defaults options,
+      columns: true
+      relax_column_count: true

@@ -11,6 +11,9 @@ routes.push
     reply.proxy
       uri: uri
       onResponse: (err, res, request, reply, settings, ttl)->
+        if not res
+          log.error 'missing response'
+          return reply('missing response').code(404)
         wreck.read res, {json: true}, (err, payload)->
           if err
             log.error err

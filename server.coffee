@@ -4,6 +4,8 @@ bunyan = require 'bunyan'
 {extend} = require './helpers'
 log = require './log'
 
+routes = require './routes/'
+
 class Server extends Hapi.Server
   constructor: (options)->
     super()
@@ -28,7 +30,11 @@ class Server extends Hapi.Server
           title: 'API'
           version: require('./package').version
 
+    log.debug count: plugins.length, 'registering'
+
     @register plugins, (err) =>
+
+      log.debug 'registered'
 
       if err
         console.log err
@@ -51,8 +57,7 @@ class Server extends Hapi.Server
             request.setUrl url
           reply.continue()
 
-      routes = require './routes/'
-
+      log.debug count: routes.length, 'adding routes'
       routes.forEach (route)=>
         route = extend route,
           config:

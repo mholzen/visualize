@@ -38,7 +38,10 @@
     "yamljs": "^0.2.8"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "coffeetape": "^1.0.1",
+    "mocha": "^3.2.0",
+    "supertest": "^3.0.0",
     "tape": "^4.4.0"
   },
   "scripts": {

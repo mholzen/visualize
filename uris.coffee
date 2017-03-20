@@ -1,10 +1,10 @@
 expand = (uri, host)->
-  if uri.match /^\w+\.\w+$/
+  if (uri.startsWith 'http://') or (uri.startsWith 'https://')
+    return uri
+  if uri.match /^(\w+\.){1,}\w+$/
     host = uri
     uri = ''
-  if uri.startsWith 'http://'
-    return uri
-  if not uri.startsWith '/'
+  if uri.length > 0 and not uri.startsWith '/'
     uri = '/' + uri
   return 'http://' + host + uri
 

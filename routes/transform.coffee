@@ -2,16 +2,18 @@ log = require '../log'
 
 {proxy, proxyPayload} = require '../proxy'
 csvparse = require 'csv-parse'
+# csvparse = require '../libs/csv-parse'
 cheerio = require 'cheerio'
 wreck = require 'wreck'
 graph = require '../libs/graph'
 stringify = require 'csv-stringify'
-stream = require 'stream'
+{Writable, Transform} = require 'stream'
 cson = require 'cson'
 boom = require 'boom'
 client = require 'request-promise'
 uris = require '../uris'
 yaml = require 'yamljs'
+{toObjectStream} = require '../libs/stream'
 
 transformers =
   transpose: (payload, response)->
@@ -32,7 +34,7 @@ routes.push
         columns: true
 
       content = []
-      transpose = new stream.Transform
+      transpose = new Transform
         objectMode: true
         transform: (chunk, encoding, done)->
           content.push chunk
@@ -72,14 +74,16 @@ routes.push
       switch
         when type.startsWith('text/csv')
           csvparse payload.toString(), {columns: true}, (err, output)->
+            if err
+              reply err
             reply output
         when type.startsWith('text/html')
           $ = cheerio.load payload.toString()
           if request.params.uri.endsWith '/'
             response =
               $('li')
-                .map (i, el)->
-                  $(this).text()
+                .map (i, el)->$(this).text()
+                .filter (i,v)-> v != 'Parent Directory'
                 .get()
             reply(JSON.stringify(response)).type('application/json')
           else
@@ -172,36 +176,19 @@ httpToStream = (method, request, stream)->
     stream.write error
 
 
+# routes.push
+#   method: 'GET'
+#   path: '/http:{method}/{uri*}'
+#   handler: (request, reply) ->
+#     httpHandler request.params.method, request, reply
+
 routes.push
   method: 'GET'
   path: '/http:{method}/{uri*}'
   handler: (request, reply) ->
-    httpHandler request.params.method, request, reply
-
-
-csvparse = require '../libs/csv-parse'
-{Transform} = require 'stream'
-
-routes.push
-  method: 'GET'
-  path: '/map/http:{method}/{uri*}'
-  handler: (request, reply) ->
-    f = (uri, request, stream)->
-      request.uri = uri
+    proxyPayload request, reply, (err, response, payload)->
+      request.params.uri = payload.toString()
       httpHandler request.params.method, request, reply
-
-    proxy request, reply, (err, response)->
-      type = response?.headers['content-type']
-      if type.startsWith 'text/csv'
-        parser = csvparse()
-        mapper = new Transform
-          objectMode: true
-          transform: (data, encoding, cb)->
-
-            cb()
-        reply(response.pipe(parser).pipe(mapper))
-      else
-        reply "cannot convert #{type} to iterator"
 
 routes.push
   method: 'GET'
@@ -231,6 +218,71 @@ routes.push
         # we are not setting all headers on the response
         reply(payload.toString()).type(type)
 
+
+
+
+routes.push
+  method: 'GET'
+  path: '/rewrite:prefix:{text}/{uri*}'
+  handler: (request, reply) ->
+    uri = request.params.text + request.params.uri
+    request.params.uri = '/' + uri
+
+    proxy request, reply, (err, response)->
+      if err
+        log.error err
+        return reply err
+      reply response
+
+
+routes.push
+  method: 'POST'
+  path: '/transform.expand'
+  handler: (request, reply) ->
+    reply(uris.expand(request.payload))
+
+
+routes.push
+  method: 'GET'
+  path: '/count/{uri*}'
+  handler: (request, reply) ->
+    proxy request, reply, (err, response)->
+      stream = toObjectStream response
+      count = 0
+      counter = new Writable
+        objectMode: true
+        write: (chunk, encoding, callback)->
+          log.debug chunk:chunk, 'counted'
+          count = count + 1
+          callback()
+
+      stream.pipe(counter)
+      counter.on 'finish', ()->
+        reply(count).type('text/plain')
+
+routes.push
+  method: 'POST'
+  path: '/count'
+  handler: (request, reply) ->
+    log.debug payload: request.payload, 'received'
+    stream = toObjectStream request
+    stream.on 'error', (err)->
+      log.debug count: count, 'responding'
+      reply('parser error', err).code(500)
+
+    count = 0
+    counter = new Writable
+      objectMode: true
+      write: (chunk, encoding, callback)->
+        log.debug chunk:chunk, 'counted'
+        count = count + 1
+        callback()
+
+    stream.pipe(counter)
+
+    counter.on 'finish', ()->
+      log.debug count: count, 'responding'
+      reply(count).type('text/plain')
 
 
 module.exports = routes
