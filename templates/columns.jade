@@ -1,0 +1,21 @@
+html(lang='en')
+  head
+    block head
+      meta(charset='utf-8')
+      title
+        block title
+          = locals.name
+      link(rel='alternate', href=locals.url+'/feed.xml', type='application/rss+xml', title=locals.description)
+      link(rel='stylesheet', href='/static/index.css')
+      link(rel='stylesheet', href='/files/pretty.css')
+      link(rel='stylesheet', type='text/css', href='http://fonts.googleapis.com/css?family=Noto+Serif')
+      link(rel='stylesheet', type='text/css', href='http://fonts.googleapis.com/css?family=Lora')
+      style.
+      
+  body
+    div(style="margin: 100 auto; width: 600px;")
+      != payload
+
+    footer
+      div.inner
+        block footer

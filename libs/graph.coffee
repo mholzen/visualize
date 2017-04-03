@@ -46,10 +46,10 @@ class Graph
   nodes: ()->
     nodes = {}
     @rdfGraph.forEach (triple)->
-      nodes[triple.subject] = nodes[triple.subject] or
+      nodes[triple.subject] = nodes[triple.subject] ?
           uri: triple.subject.toString()
-      if not (triple.object instanceof rdf.Literal)
-        nodes[triple.object] = nodes[triple.object] or
+      if not (triple.object instanceof rdf.Literal) and triple.predicate.toString() != 'url'
+        nodes[triple.object] = nodes[triple.object] ?
           uri: triple.object.toString()
       nodes[triple.subject][triple.predicate] = triple.object.toString()
     return nodes

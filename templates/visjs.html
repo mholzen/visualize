@@ -4,14 +4,14 @@
   <title>{{uri}}</title>
 
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.0/vis.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.0/vis.min.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.19.1/vis.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.19.1/vis.min.css" rel="stylesheet" type="text/css" />
 
   <style type="text/css">
     #mynetwork {
       width: 100%;
-      height: 100vh;
-      border: 1px solid lightgray;
+      height: 90vh;
+      /*border: 1px solid lightgray;*/
     }
     p {
       max-width:600px;
@@ -20,12 +20,10 @@
 </head>
 
 <body>
-<a href="{{uri}}">source</a>
+<!-- <a href="{{uri}}">source</a> -->
 <div id="mynetwork"></div>
 
 <script type="text/javascript">
-
-var DOMURL = window.URL || window.webkitURL || window;
 
 function render(payload) {
   var container = document.getElementById('mynetwork');
@@ -43,15 +41,36 @@ function render(payload) {
     return from;
   }
   payload.nodes.forEach(function(node) {
+    console.log(node);
     node.label = node.label || node['http://www.w3.org/1999/02/22-rdf-syntax-ns#label'];
     if (!node.label) {
       node.label = short(node.uri);
     }
+
+    if (typeof node.html != 'undefined') {
+      node.shape = 'image';
+
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="390" height="65">' +
+          '<rect x="0" y="0" width="100%" height="100%" fill="#7890A7" stroke-width="20" stroke="#ffffff" ></rect>' +
+          '<foreignObject x="15" y="10" width="100%" height="100%">' +
+          '<body xmlns="http://www.w3.org/1999/xhtml">' +
+          node.html +
+          '</body>' +
+          '</foreignObject>' +
+          '</svg>';
+
+      node.image = "data:image/svg+xml;charset=utf-8,"+ encodeURIComponent(svg);
+    }
+
     node.shape = node.shape || 'circle';
-    // node.shape = 'dot';
+    // node.shape = 'circularImage';
     // node.font = {size: 20};
     node.size = node.size || 50;
     // node.color = 'red';
+    if (node.url) {
+      node.color = {};
+      node.color.border = 'SandyBrown';
+    }
   });
 
   payload.edges.forEach(function(edge) {
@@ -68,9 +87,46 @@ function render(payload) {
     layout: {
       // hierarchical: 'ud',
       randomSeed: 3
-    }
+    },
+    "physics": {
+      "barnesHut": {
+        "gravitationalConstant": -5400,
+        "springLength": 85
+      },
+      "minVelocity": 0.75
+    },
+    interaction: {hover:true},
+    edges: {
+      color: 'gray',
+      font: "14px Georgia black"
+    },
+    nodes: {
+      color: '#ddd',
+      font: "14px Georgia black"
+    },
+
   };
   var network = new vis.Network(container, data, options);
+
+  network.on( 'click', function(event) {
+    var href = data.nodes[event.nodes].url;
+    if (typeof href == 'string') {
+      if (window.location != window.parent.location)
+        window.parent.location.assign(href);
+      else
+        window.location.assign(href);
+      // window.open(href);
+    }
+  });
+  network.on('hoverNode', function (event) {
+    if (typeof data.nodes[event.node].url == 'string') {
+      network.canvas.body.container.style.cursor = 'pointer'
+    }
+    return false;
+  });
+  network.on('blurNode', function (event) {
+      network.canvas.body.container.style.cursor = 'default'
+ });
 };
 
 document.addEventListener('keypress', (event) => {

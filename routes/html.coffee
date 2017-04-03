@@ -17,7 +17,7 @@ routes.push
         reply toHtml payload
       else if type.startsWith('text/plain') or type.startsWith('application/octet-stream')
         payload = payload.toString()
-        payload = payload.replace /\si:(\w+)\s/g, '<iframe frameBorder="0" src="$1"></iframe>'
+        payload = payload.replace /\siframe:([^\s]+)\s/g, '<iframe frameBorder="0" src="$1"></iframe>'
         reply marked( payload )
       else
         reply(payload).headers = response.headers

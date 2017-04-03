@@ -5,6 +5,7 @@ table {
 }
 
 td {
+  width: 800px;
   border: solid 1pt black;
   text-align: center;
   font-size: 12pt;
@@ -16,5 +17,28 @@ h1, h2, h3, p, li, table {
   font-family: 'Lora';
 }
 li {
-  list-style-type: none;
+  /*list-style-type: none;*/
+}
+
+iframe {
+  width: 600px;
+  height: 600px;
+}
+
+p {
+  padding-top: 5px;
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: SandyBrown ;
+}
+
+blockquote {
+  font-style: italic;
+}
+
+pre {
+  margin-left: 40px;
 }
