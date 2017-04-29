@@ -15,7 +15,7 @@ routes.push
       if type.startsWith 'application/json'
         payload = JSON.parse payload.toString()
         reply toHtml payload
-      else if type.startsWith('text/plain') or type.startsWith('application/octet-stream')
+      else if type.startsWith('text/') or type.startsWith('application/octet-stream')
         payload = payload.toString()
         payload = payload.replace /\siframe:([^\s]+)\s/g, '<iframe frameBorder="0" src="$1"></iframe>'
         reply marked( payload )

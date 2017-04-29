@@ -41,7 +41,6 @@ function render(payload) {
     return from;
   }
   payload.nodes.forEach(function(node) {
-    console.log(node);
     node.label = node.label || node['http://www.w3.org/1999/02/22-rdf-syntax-ns#label'];
     if (!node.label) {
       node.label = short(node.uri);
@@ -66,10 +65,15 @@ function render(payload) {
     // node.shape = 'circularImage';
     // node.font = {size: 20};
     node.size = node.size || 50;
-    // node.color = 'red';
+    node.widthConstraint = {
+      minimum: 100 * (node.label.length > 0),
+      maximum: 200
+    };
+
     if (node.url) {
-      node.color = {};
-      node.color.border = 'SandyBrown';
+      node.color = {
+        border: 'SandyBrown'
+      }
     }
   });
 
@@ -85,7 +89,9 @@ function render(payload) {
   };
   var options = {
     layout: {
-      // hierarchical: 'ud',
+      // hierarchical: {
+      //   sortMethod: 'directed'
+      // },
       randomSeed: 3
     },
     "physics": {
@@ -106,6 +112,12 @@ function render(payload) {
     },
 
   };
+  var h = getParameterByName('hierarchical');
+  if (h) {
+    options.layout.hierarchical = h;
+  }
+  console.log(options);
+
   var network = new vis.Network(container, data, options);
 
   network.on( 'click', function(event) {
@@ -127,14 +139,42 @@ function render(payload) {
   network.on('blurNode', function (event) {
       network.canvas.body.container.style.cursor = 'default'
  });
+ return {
+   getState: function () {
+     return network.getPositions();
+   },
+   setState: function(nodes) {
+     for(id in nodes) {
+       network.moveNode(id, nodes[id].x, nodes[id].y);
+     }
+   }
+ };
 };
 
+var network;
+function load() {
+  $.getJSON("{{uri}}", function(payload) {
+    network = render(payload);
+  });
+}
+
 document.addEventListener('keypress', (event) => {
-  if (event.key == 'r') $.getJSON("{{uri}}", render);
+  if (event.key == 'r') load();
 }, false);
 
-$.getJSON("{{uri}}", render);
+load();
 
+function getParameterByName(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 
 </script>
 
