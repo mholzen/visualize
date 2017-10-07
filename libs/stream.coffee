@@ -1,4 +1,6 @@
 csvparse = require 'csv-parse'
+split = require 'split2'
+CSON = require 'cson-parser'
 
 toObjectStream = (response)->
   type = response.headers['content-type']
@@ -6,6 +8,8 @@ toObjectStream = (response)->
     log.warn headers: response.headers, path: response.path, 'no content-type in response'
     type = 'text/csv'
   switch
+    when type.startsWith 'application/json'
+      response.pipe(split(CSON.parse))
     when type.startsWith('text/csv')
       parser = csvparse()#{columns: true})
       parser.on 'error', (err)->

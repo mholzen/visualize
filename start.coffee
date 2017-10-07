@@ -1,6 +1,8 @@
 {Server} = require './server'
 
-server = new Server()
+server = new Server
+  rewrites: (path)->
+    path.replace '/pretty/', '/templates/pretty.jade/'
 
 server.start (err)->
   if err

@@ -31,9 +31,7 @@ class Server extends Hapi.Server
           version: require('./package').version
 
     log.debug count: plugins.length, 'registering'
-
     @register plugins, (err) =>
-
       log.debug 'registered'
 
       if err
@@ -52,8 +50,14 @@ class Server extends Hapi.Server
         path: Path.join process.cwd(), 'templates'
 
       if options?.rewrites?
+        rewrite = if typeof options.rewrites == 'object'
+            (path)-> options.rewrites[path]
+          else
+            options.rewrites
+
         @ext 'onRequest', (request, reply) ->
-          if (url = options.rewrites[request.path])?
+          if (url = rewrite request.path )?
+            log.debug {url}, 'rewrote path to url'
             request.setUrl url
           reply.continue()
 

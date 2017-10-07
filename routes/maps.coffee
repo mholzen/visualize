@@ -76,6 +76,19 @@ routes.push
 #           .catch (err)->0
 #       .forEach (response)->
 
+toArray = require 'stream-to-array'
+
+routes.push
+  method: 'GET'
+  path: '/map/{uri*}'
+  handler: (request, reply) ->
+    proxy request, reply, (err, response)->
+      stream = toObjectStream(response)
+      toArray stream, (err, array)->
+        if err
+          reply err
+        else
+          reply JSON.stringify array
 
 rp = require 'request-promise'
 routes.push

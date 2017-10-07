@@ -113,5 +113,16 @@ toHtml = (from, context)->
       from = '<a href="' + from + '">' + from[0..80] + '</a>'
     return from?.toString()
 
-module.exports =
-  toHtml: toHtml
+
+toAnchor = (label, href)->
+  "<a href='#{href}'>#{label}</a>"
+
+toList = (value, root)->
+  if typeof value == 'object'
+    '<ul>' +
+      for label, path of value
+        "<li>" + toAnchor label, root + path
+
+module.exports = {
+  toAnchor, toList, toHtml
+}

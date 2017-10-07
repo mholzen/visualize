@@ -1,9 +1,18 @@
 {proxyPayload} = require '../proxy'
 
+getDate = (o)->
+  o.date_added ? o.timestamp
+
+toDateInt = (o)->
+  if /^\d+$/.test o
+    parseInt o
+  else
+    Date.parse o
+
 sorters =
   recent: (payload, response)->
     content = JSON.parse payload.toString()
-    content = content.sort (a,b)-> (parseInt(b.date_added) - parseInt(a.date_added))      # TODO: performance
+    content = content.sort (a,b)-> (toDateInt(getDate(b)) - toDateInt(getDate(a)))
     return content
 
 routes = []
