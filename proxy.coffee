@@ -21,18 +21,18 @@ proxy = (request, reply, callback)->
 
 proxyPayload = (request, reply, callback)->
   uri = uris.addScheme request
-  log.debug uri: uri, "fetching"
+  log.debug 'proxy request', {uri}
   reply.proxy
     uri: uri
     passThrough: true
     acceptEncoding: false
     localStatePassThrough: true
     onResponse: (err, response, request, reply, settings, ttl)->
-      log.debug {err: err, stausCode: response.statusCode}, 'received'
+      log.debug 'proxy response', {err: err, statusCode: response.statusCode, contentType: response.headers['content-type']},
       if err
         reply err
       if not response?
-        log.error 'no response', {uri: request.params.uri}
+        log.error 'no proxy response', {uri: request.params.uri}
       if response.statusCode == 404
         response.url = request.uri
         return reply response

@@ -1,4 +1,5 @@
 {Server} = require './server'
+log = require './log'
 
 server = new Server
   rewrites: (path)->
@@ -6,6 +7,6 @@ server = new Server
 
 server.start (err)->
   if err
-    console.error err
+    log.error err
   else
-    console.log 'Server running at:', server.info.uri
+    log.info 'Server running at:', server.info.uri

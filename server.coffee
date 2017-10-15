@@ -21,7 +21,7 @@ class Server extends Hapi.Server
     plugins.push
       register: require 'hapi-bunyan'
       options:
-        logger: log
+        logger: log.bunyanLogger
 
     plugins.push
       register: require 'hapi-swagger'
@@ -46,19 +46,22 @@ class Server extends Hapi.Server
             module: require 'jade'
             isCached: false
         defaultExtension: 'html'
-        # TODO: must be able to use templates from the enclosing directory
+          # TODO: must be able to use templates from the enclosing directory
         path: Path.join process.cwd(), 'templates'
 
       if options?.rewrites?
-        rewrite = if typeof options.rewrites == 'object'
-            (path)-> options.rewrites[path]
-          else
-            options.rewrites
+        if typeof options.rewrites == 'object'
+          rewrite = (path)->
+            if options.rewrites[path]?
+              return options.rewrites[path]
+        if typeof options.rewrites == 'function'
+          rewrite = options.rewrites
 
         @ext 'onRequest', (request, reply) ->
-          if (url = rewrite request.path )?
-            log.debug {url}, 'rewrote path to url'
-            request.setUrl url
+          if (path = rewrite request.path )?
+            log.debug 'rewrote pathname', {path}
+            request.url.pathname = path
+            request.setUrl request.url
           reply.continue()
 
       log.debug count: routes.length, 'adding routes'
