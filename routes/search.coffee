@@ -1,37 +1,24 @@
 log = require '../log'
-
-{proxy, proxyPayload} = require '../proxy'
-cheerio = require 'cheerio'
-url = require 'url'
+{search, createQuery} = require 'search'
+{Transform} = require 'stream'
 
 routes = []
 
-searches =
-  href: ($)->
-    $('a').map ()->$(this).prop('href')
-    .get()
-
-  images: ($)->
-    $('img').map( ()->
-      $(this).attr('src')
-    ).get()
-
-
 routes.push
   method: 'GET'
-  path: '/search:{query}/{uri*}'
-  handler: (request, reply) ->
-    log.debug request.url, url.format(request.url)
-    proxyPayload request, reply, (err, response, payload)->
-      type = response?.headers['content-type'] ? 'text/html'
-      if type?.startsWith('text/html')
-        $ = cheerio.load payload.toString()
-        log.debug payload: payload.toString()
-        results = searches[request.params.query]($)
-        # results = results.filter (url)->
-        #   url.startsWith('.') or url.startsWith('/'+request.params.uri)
-        reply(JSON.stringify(results)).type('application/json')
-      else
-        reply("cannot search in #{type}").code(400)
+  path: '/search'
+  config:
+    handler: (request, reply) ->
+      query = createQuery request.query
+      results = search query
+      stream = new Transform
+        readableObjectMode: false
+        writableObjectMode: true
+        transform: (chunk, encoding, callback)->
+          this.push JSON.stringify(chunk) + '\n'
+          callback()
+
+      results.pipe stream
+      reply(stream).type('application/json')
 
 module.exports = routes
