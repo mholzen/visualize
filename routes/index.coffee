@@ -30,32 +30,23 @@ routes.push
           uri: request.params.uri
           content: payload.toString()
 
-log.debug 'graph'
-routes.push (require './graph')...
-log.debug 'slice'
-routes.push (require './slice')...
-log.debug 'join'
-routes.push (require './join')...
-log.debug 'tail'
-routes.push (require './tail')...
-log.debug 'html'
-routes.push (require './html')...
-log.debug 'search'
-routes.push (require './search')...
-log.debug 'templates'
-routes.push (require './templates') ...
-log.debug 'literal'
-routes.push (require './literal') ...
-log.debug 'slideshow'
-routes.push require './slideshow'
-log.debug 'filters'
-routes.push require './filters'
-log.debug 'maps'
-routes.push require './maps'
-log.debug 'transform'
-routes.push require './transform'
-log.debug 'sort'
-routes.push require './sort'
+load = (name)->
+  log.debug 'add route', name
+  routes.push (require './' + name)...
+
+load 'graph'
+load 'slice'
+load 'join'
+load 'tail'
+load 'html'
+load 'search'
+load 'templates'
+load 'literal'
+load 'slideshow'
+load 'filters'
+load 'maps'
+load 'transform'
+load 'sort'
 
 routes.push
   method: 'GET'
