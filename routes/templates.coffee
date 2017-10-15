@@ -7,22 +7,19 @@ routes.push
   method: 'GET'
   path: '/templates/{template}/{uri*}'
   handler: (request, reply) ->
-    uri = 'http://' + request.info.host + '/' + request.params.uri
-    reply.proxy
-      uri: uri
-      onResponse: (err, res, request, reply, settings, ttl)->
-        if not res
-          log.error 'missing response'
-          return reply('missing response').code(404)
-        wreck.read res, {json: true}, (err, payload)->
-          if err
-            log.error err
-            return reply err
-          reply.view request.params.template,
-            uri: uri
-            payload: payload
-            content: payload?.toString()
-            get: (url)->'GET ' + url
+    proxyPayload request, reply, (err, response, payload)->
+      if err
+        log.error err
+        reply err
+      if response.headers['content-type'].startsWith 'text/html'
+        reply.view request.params.template,
+          uri: request.params.uri
+          payload: payload
+          content: payload?.toString()
+          get: (url)->'GET ' + url
+      else
+        reply(payload).headers = response.headers
+
 
 {proxy, proxyPayload} = require '../proxy'
 {dirname} = require 'path'
