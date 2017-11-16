@@ -52,8 +52,13 @@ routes.push
           flush: (done)->
             this.push '</table>'
             done()
-
         reply response.pipe(parser).pipe(transformer).pipe(serialize)
         .type 'text/html'
+
+      if response.headers['content-type'].startsWith 'application/json'
+
+        reply('to be implemented')
+
+
 
 module.exports = routes

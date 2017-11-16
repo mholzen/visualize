@@ -12,7 +12,7 @@ routes.push
     urls = if arg.endsWith '/'
       arg = 'search:href/' + arg
       uri = uris.expand arg, request.info.host
-      rp.get uri: uri
+      rp.get(uri: uri)
       .then (body)->
         log.debug 'should extract url from ' + body
         urls = JSON.parse body

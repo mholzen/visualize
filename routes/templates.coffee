@@ -1,8 +1,16 @@
 wreck = require 'wreck'
 {expand} = require '../uris'
 log = require '../log'
+{proxy, proxyPayload} = require '../proxy'
 
 routes = []
+
+routes.push
+  method: 'GET'
+  path: '/templates/{template}'
+  handler: (request, reply) ->
+    reply.view request.params.template
+
 routes.push
   method: 'GET'
   path: '/templates/{template}/{uri*}'
@@ -11,7 +19,7 @@ routes.push
       if err
         log.error err
         reply err
-      if response.headers['content-type'].startsWith 'text/html'
+      if response.headers['content-type']?.startsWith 'text/'
         reply.view request.params.template,
           uri: request.params.uri
           payload: payload
@@ -21,7 +29,6 @@ routes.push
         reply(payload).headers = response.headers
 
 
-{proxy, proxyPayload} = require '../proxy'
 {dirname} = require 'path'
 rp = require 'request-promise'
 pug = require 'pug'

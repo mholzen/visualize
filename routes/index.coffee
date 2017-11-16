@@ -32,7 +32,7 @@ routes.push
 
 load = (name)->
   log.debug 'add route', name
-  routes.push (require './' + name)...
+  routes.push (require './' + name)
 
 load 'graph'
 load 'slice'
