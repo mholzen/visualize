@@ -26,6 +26,10 @@
 <script type="text/javascript">
 
 function render(payload) {
+  if (payload instanceof Array) {
+    return render(payload[0]);
+  }
+
   var container = document.getElementById('mynetwork');
 
   function short(from) {
@@ -40,7 +44,14 @@ function render(payload) {
     }
     return from;
   }
-  payload.nodes.forEach(function(node) {
+  payload.nodes = payload.nodes.map(function(node) {
+    if (typeof node == 'string') {
+      node = {
+        id: node,
+        label: node
+      }
+    }
+
     node.label = node.label || node['http://www.w3.org/1999/02/22-rdf-syntax-ns#label'];
     if (!node.label) {
       node.label = short(node.uri);
@@ -66,7 +77,7 @@ function render(payload) {
     // node.font = {size: 20};
     node.size = node.size || 50;
     node.widthConstraint = {
-      minimum: 100 * (node.label.length > 0),
+      minimum: 100 * ((node.label || []).length > 0),
       maximum: 200
     };
 
@@ -75,6 +86,7 @@ function render(payload) {
         border: 'SandyBrown'
       }
     }
+    return node;
   });
 
   payload.edges.forEach(function(edge) {

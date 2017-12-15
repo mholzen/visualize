@@ -129,4 +129,13 @@ routes.push
       reply.view 'visjs',
         uri: request.params.uri,
 
+routes.push
+  method: 'GET'
+  path: '/visjs2/{uri*}'
+  config:
+    handler: (request, reply) ->
+      request.params.uri = '/reducers/graph/' + request.params.uri
+      reply.view 'visjs',
+        uri: request.params.uri,
+
 module.exports = routes

@@ -13,7 +13,9 @@ boom = require 'boom'
 client = require 'request-promise'
 uris = require '../uris'
 yaml = require 'yamljs'
-{toObjectStream} = require '../libs/stream'
+{toObjectStream, toHighland} = require '../libs/stream'
+
+{reducers, parse} = require 'transform'
 
 transformers =
   transpose: (payload, response)->
@@ -284,5 +286,24 @@ routes.push
       log.debug count: count, 'responding'
       reply(count).type('text/plain')
 
+routes.push
+  method: 'GET'
+  path: '/reducers'
+  handler: (request, reply) ->
+    reply JSON.stringify Object.keys reducers
+
+routes.push
+  method: 'GET'
+  path: '/reducers/{reducer}/{uri*}'
+  handler: (request, reply) ->
+    # find reducer
+    if not reducers[request.params.reducer]?
+      return reply 404, 'cannot find reducer'
+    [memo, reducer] = reducers[request.params.reducer]()
+    proxy request, reply, (err, response)->
+      s = toHighland(response)
+      # s.each (x)->console.log x
+      s.reduce(memo, reducer).toArray (memo)->
+        reply memo
 
 module.exports = routes

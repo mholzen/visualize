@@ -5,18 +5,19 @@ log = require './log'
 # TODO: does not support redirects
 
 proxy = (request, reply, callback)->
+  uri = uris.addScheme request
   reply.proxy
-    uri: uris.addScheme request
+    uri: uri
     passThrough: true
     acceptEncoding: false
     localStatePassThrough: true
     onResponse: (err, response, request, reply, settings, ttl)->
-      log.debug {err: err, stausCode: response.statusCode}, 'received'
+      log.debug {err, uri, stausCode: response.statusCode, 'content-type': response.headers['content-type']}, 'received'
       if response.statusCode == 404
         # how to augment the error with the uri?
-        console.log "404 - " + request.params.uri
+        log.error "404 - " + request.params.uri
         return reply response
-      console.log response.headers['content-type']
+
       callback err, response, request, reply, settings, ttl
 
 proxyPayload = (request, reply, callback)->

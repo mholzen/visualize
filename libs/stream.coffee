@@ -1,6 +1,8 @@
 csvparse = require 'csv-parse'
 split = require 'split2'
 CSON = require 'cson-parser'
+highland = require 'highland'
+
 
 toObjectStream = (response)->
   type = response.headers['content-type']
@@ -9,7 +11,11 @@ toObjectStream = (response)->
     type = 'text/csv'
   switch
     when type.startsWith 'application/json'
-      response.pipe(split(CSON.parse))
+      # WARNING: assumes it is JSON lines.  what if single JSON object?
+      # response.pipe(split(CSON.parse))
+      response.pipe CSON.parse
+    when type.startsWith('text/plain') or type.startsWith('application/octet-stream')
+      highland(response).split()
     when type.startsWith('text/csv')
       parser = csvparse()#{columns: true})
       parser.on 'error', (err)->
@@ -19,9 +25,14 @@ toObjectStream = (response)->
         parser.end(response.payload.toString())
         parser
       else
-        response.pipe(parser)
+        response.pipe parser
     else
       throw new Error "cannot create stream from #{type}"
 
-module.exports =
-  toObjectStream: toObjectStream
+toHighland = (respone)->
+  highland(toObjectStream(respone))
+
+module.exports = {
+  toObjectStream
+  toHighland
+}
