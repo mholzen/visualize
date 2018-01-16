@@ -1,4 +1,5 @@
 {toHtml} = require '../libs/html'
+log = require '../log'
 
 routes = []
 
@@ -17,7 +18,9 @@ routes.push
         reply toHtml payload
       else if type.startsWith('text/') or type.startsWith('application/octet-stream')
         payload = payload.toString()
+        # TODO: should use '/mappers/markdown/'
         payload = payload.replace /\siframe:([^\s]+)\s/g, '<iframe frameBorder="0" src="$1"></iframe>'
+        payload = payload.replace /(?:\s)thumb:([^\s]+)/g, ' <a r=1 href="$1"><img src="$1"></a>'
         reply marked( payload )
       else
         reply(payload).headers = response.headers

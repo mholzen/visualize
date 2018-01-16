@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  src=$(map source)
+else
+  src="$1"
+fi
+
+if [[ $src != http* ]] ; then
+  src="http://localhost:8001/$src"
+fi
+
+open "$src"

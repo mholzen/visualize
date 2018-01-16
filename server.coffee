@@ -74,11 +74,12 @@ class Server extends Hapi.Server
 
       log.debug count: routes.length, 'adding routes'
       routes.forEach (route)=>
-        route = extend route,
-          config:
-            handler: route.config?.handler or route.handler
-            tags: ['api']
-        delete route.handler
+        if route.handler?
+          route = extend route,
+            config:
+              handler: route.config?.handler or route.handler
+              tags: ['api']
+          delete route.handler
         @route route
 
 module.exports =

@@ -163,9 +163,10 @@ function render(payload) {
  };
 };
 
+var uri = '{{{uri}}}';
 var network;
-function load() {
-  $.getJSON("{{uri}}", function(payload) {
+function load(uri) {
+  $.getJSON(uri, function(payload) {
     network = render(payload);
   });
 }
@@ -174,7 +175,11 @@ document.addEventListener('keypress', (event) => {
   if (event.key == 'r') load();
 }, false);
 
-load();
+if (uri) {
+  load(uri);
+} else {
+  network = {{{payload}}}
+}
 
 function getParameterByName(name, url) {
     if (!url) {

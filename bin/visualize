@@ -1,4 +1,6 @@
 #!/bin/bash
 
 cd ~/develop/mholzen/visualize
-npm run "$@"
+command=$1
+shift
+npm run $command -- "$@"

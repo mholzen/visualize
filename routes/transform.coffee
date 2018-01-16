@@ -15,7 +15,7 @@ uris = require '../uris'
 yaml = require 'yamljs'
 {toObjectStream, toHighland} = require '../libs/stream'
 
-{reducers, parse} = require 'transform'
+{reducers, mappers, parse} = require 'transform'
 
 transformers =
   transpose: (payload, response)->
@@ -304,6 +304,27 @@ routes.push
       s = toHighland(response)
       # s.each (x)->console.log x
       s.reduce(memo, reducer).toArray (memo)->
+        reply memo
+
+routes.push
+  method: 'GET'
+  path: '/mappers'
+  handler: (request, reply) ->
+    reply JSON.stringify Object.keys mappers
+
+routes.push
+  method: 'GET'
+  path: '/mappers/{mapper}/{uri*}'
+  handler: (request, reply) ->
+    # find reducer
+    if not mappers[request.params.mapper]?
+      return reply 404, 'cannot find mapper'
+    mapper = mappers[request.params.mapper]()
+    proxy request, reply, (err, response)->
+      s = toHighland(response)
+      s.map(mapper).toArray (memo)->
+        if not request.params.uri.endsWith '/'
+          memo = memo.join '\n'
         reply memo
 
 module.exports = routes

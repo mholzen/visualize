@@ -2,6 +2,18 @@ uris = require './uris'
 wreck = require 'wreck'
 log = require './log'
 
+error = (response, request)->
+  if response.statusCode > 400
+    # how to augment response rather than replace
+    response =
+      statusCode: response.statusCode
+      error: response.error
+      url: request.params.uri
+
+    log.error 'proxy error', {response}
+    return response
+
+
 # TODO: does not support redirects
 
 proxy = (request, reply, callback)->
@@ -13,30 +25,27 @@ proxy = (request, reply, callback)->
     localStatePassThrough: true
     onResponse: (err, response, request, reply, settings, ttl)->
       log.debug {err, uri, stausCode: response.statusCode, 'content-type': response.headers['content-type']}, 'received'
-      if response.statusCode == 404
-        # how to augment the error with the uri?
-        log.error "404 - " + request.params.uri
-        return reply response
+      if (errorResponse = error(response, request))
+        return reply(errorResponse)
 
       callback err, response, request, reply, settings, ttl
 
 proxyPayload = (request, reply, callback)->
   uri = uris.addScheme request
-  log.debug 'proxy request', {uri}
+  log.debug {uri}, 'proxy request'
   reply.proxy
     uri: uri
     passThrough: true
     acceptEncoding: false
     localStatePassThrough: true
     onResponse: (err, response, request, reply, settings, ttl)->
-      log.debug 'proxy response', {err: err, statusCode: response.statusCode, contentType: response.headers['content-type']},
+      log.debug {err: err, statusCode: response.statusCode, contentType: response.headers['content-type']}, 'proxy response'
       if err
         reply err
       if not response?
         log.error 'no proxy response', {uri: request.params.uri}
-      if response.statusCode == 404
-        response.url = request.uri
-        return reply response
+      if (errorResponse = error(response, request))
+        return reply(errorResponse)
       wreck.read response, null, (err, payload)->
         if err
           reply err

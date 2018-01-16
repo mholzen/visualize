@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-register": "^6.26.0",
@@ -51,6 +50,8 @@
     "yamljs": "^0.2.8"
   },
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "chai": "^3.5.0",
     "coffee-loader": "^0.8.0",
@@ -67,7 +68,7 @@
     "stop": "forever -a stop start.coffee",
     "watch": "forever --debug -v -a -w --watchIgnore 'files/**' -c coffee start.coffee | bunyan",
     "log": "forever logs -f start.coffee",
-    "open": "open http://localhost:8001"
+    "open": "bin/open"
   },
   "author": "",
   "license": "BSD-2-Clause"
