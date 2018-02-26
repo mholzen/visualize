@@ -1,0 +1,7 @@
+if [[ -z "$@" ]]; then
+  url=$(map url)
+else
+  url=$(search limit:1 "$@" | map url)
+fi
+
+/usr/bin/open "$url"
