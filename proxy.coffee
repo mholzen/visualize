@@ -44,6 +44,8 @@ proxyPayload = (request, reply, callback)->
         reply err
       if not response?
         log.error 'no proxy response', {uri: request.params.uri}
+      if [301, 302].includes response.statusCode
+        return reply response
       if (errorResponse = error(response, request))
         return reply(errorResponse)
       wreck.read response, null, (err, payload)->
