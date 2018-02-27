@@ -1,1 +1,3 @@
 filter a resource that is a collection could grep for files within it
+- rewrite management (extensibility)
+  so that I can easily add/delete route maps
