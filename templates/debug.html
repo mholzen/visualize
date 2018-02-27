@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+<head>
+  <script type="text/javascript">
+  var parser = document.createElement('a');
+  parser.href = {{uri}};
+  var paths = parser.pathname.split('/');
+  </script>
+</head>
+<body>
+  <p><a href="{{uri}}">{{uri}}</a></p>
+  <iframe src="{{uri}}"/>
+</body>
+</html>
