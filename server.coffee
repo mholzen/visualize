@@ -6,10 +6,6 @@ log = require './log'
 
 routes = require './routes/'
 
-require('babel-core/register')({
-    presets: ['es2015', 'react']
-})
-
 class Server extends Hapi.Server
   constructor: (options)->
     super()
@@ -48,9 +44,6 @@ class Server extends Hapi.Server
             isCached: false
           jade:
             module: require 'jade'
-            isCached: false
-          jsx:
-            module: require 'hapi-react-views'
             isCached: false
 
         defaultExtension: 'html'
