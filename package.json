@@ -68,7 +68,7 @@
     "stop": "forever -a stop start.coffee",
     "watch": "forever --debug -v -a -w --watchIgnore 'files/**' -c coffee start.coffee | bunyan",
     "log": "forever logs -f start.coffee",
-    "open": "bin/open"
+    "open": "bin/open-visualize"
   },
   "author": "",
   "license": "BSD-2-Clause"

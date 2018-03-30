@@ -1,8 +1,4 @@
-body {
-  background-image: url(/files/lake.jpg);
-  background-size: 120%;
-  background-repeat: no-repeat;
-}
+@import url('/files/css/index.css');
 
 table {
   width: 100%;

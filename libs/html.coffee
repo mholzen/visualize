@@ -97,10 +97,10 @@ toHtml = (from, context)->
       s += '</tr></table>'
       return s
 
-  else if from instanceof Object
+  else if value instanceof Object
     # serialize the remaining
     s = '<table>'
-    for k, v of from
+    for k, v of value
       s += '<tr><td>' + k + '</td>'
       s += '<td>' + toHtml(v,k) + '</td>'
     s += '</table>'
