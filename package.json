@@ -63,7 +63,8 @@
     "stop": "forever -a stop start.coffee",
     "watch": "forever --debug -v -a -w --watchIgnore 'files/**' -c coffee start.coffee | bunyan",
     "log": "forever logs -f start.coffee",
-    "open": "bin/open-visualize"
+    "open": "bin/open-visualize",
+    "deploy": "ssh -A web '(cd visualize; git pull)'"
   },
   "author": "",
   "license": "BSD-2-Clause"

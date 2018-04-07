@@ -69,19 +69,19 @@ iterate = (from)->
 
 moment = require 'moment'
 
-toHtml = (from, context)->
-  log.debug from
+toHtml = (value, context)->
+  log.debug value
   # the choice of row vs col could be made based on cardinality
   # once made?  does it imply the alternative for the value?
-  if from instanceof Array
+  if value instanceof Array
     # if all items have the same structure, then extract structure into headers
-    if (c = clusters(from.map (x) -> Object.keys(x))).length <= 3
+    if (c = clusters(value.map (x) -> Object.keys(x))).length <= 3
       # display array top to bottom
       headers = c[0].key.split ','
       s = '<table><thead>'
       s += headers.map((item)->('<th>' + toHtml(item) + '</th>')).join('')
       s += '</thead>'
-      s += from.map (item)->
+      s += value.map (item)->
         r = '<tr>'
         r += headers.map (header)-> '<td>' + toHtml(item[header], header) + '</td>'
           .join ''
@@ -93,7 +93,7 @@ toHtml = (from, context)->
     else
       # display array left to right
       s = '<table><tr>'
-      s += from.map((item)->('<td>' + toHtml(item) + '</td>')).join('')
+      s += value.map((item)->('<td>' + toHtml(item) + '</td>')).join('')
       s += '</tr></table>'
       return s
 
@@ -107,11 +107,11 @@ toHtml = (from, context)->
     return s
   else
     if context?.includes 'date'
-      from = toDate from, context
-      from = moment(from).fromNow()
-    else if from?.match? and from?.match /^https?:/
-      from = '<a href="' + from + '">' + from[0..80] + '</a>'
-    return from?.toString()
+      value = toDate value, context
+      value = moment(value).valueNow()
+    else if value?.match? and value?.match /^https?:/
+      value = '<a href="' + value + '">' + value[0..80] + '</a>'
+    return value?.toString()
 
 
 toAnchor = (label, href)->
