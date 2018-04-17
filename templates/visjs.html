@@ -100,7 +100,6 @@ function render(payload) {
     edges: payload.edges
   };
   var options = {
-<<<<<<< e6224d77067e6e26f90ff9793a29d1fbafbd961e
     layout: {
       // hierarchical: {
       //   sortMethod: 'directed'
@@ -131,15 +130,6 @@ function render(payload) {
   }
   console.log(options);
 
-=======
-    layout:{
-      // hierarchical: {
-      //   direction: 'UD'
-      // },
-      randomSeed: 3
-    }
-  };
->>>>>>> add open-url
   var network = new vis.Network(container, data, options);
 
   network.on( 'click', function(event) {

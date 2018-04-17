@@ -1,7 +1,6 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-  # TOFIX: when stdin is empty, this blocks
   src=$(map source)
 else
   src="$1"
