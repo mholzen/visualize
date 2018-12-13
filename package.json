@@ -1,9 +1,11 @@
 {
   "name": "@vonholzen/visualize",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@vonholzen/log": "^1.0.0",
+    "@vonholzen/transform": "^1.0.2",
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.26.0",
     "boom": "^4.0.0",

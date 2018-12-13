@@ -1,7 +1,7 @@
 React = require 'react'
 request = require 'request'
 stream = require 'highland'
-{parse} = require 'transform'
+{parse} = require '@vonholzen/transform'
 
 class SearchForm extends React.Component
   constructor: (props)->

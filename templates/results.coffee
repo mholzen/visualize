@@ -1,7 +1,7 @@
 React = require 'react'
 request = require 'request'
 highland = require 'highland'
-{parse} = require 'transform'
+{parse} = require '@vonholzen/transform'
 
 class Results extends React.Component
   constructor: (props)->

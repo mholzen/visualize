@@ -1,5 +1,5 @@
 bunyan = require 'bunyan'
-log = require 'log'
+log = require '@vonholzen/log'
 
 bunyanLogger = bunyan.createLogger
   name: 'visualize', level: 'debug'

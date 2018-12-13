@@ -15,7 +15,7 @@ uris = require '../uris'
 yaml = require 'yamljs'
 {toObjectStream, toHighland} = require '../libs/stream'
 
-{reducers, mappers, parse} = require 'transform'
+{reducers, mappers, parse} = require '@vonholzen/transform'
 
 transformers =
   transpose: (payload, response)->

@@ -3,7 +3,7 @@ split = require 'split2'
 CSON = require 'cson-parser'
 highland = require 'highland'
 log = require '../log'
-{parse} = require 'transform'
+{parse} = require '@vonholzen/transform'
 
 toObjectStream = (response)->
   type = response.headers['content-type']
